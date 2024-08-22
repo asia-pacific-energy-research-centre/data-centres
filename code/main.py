@@ -25,14 +25,15 @@ def project_energy_use(config):
 
     for economy in config['economies']:
         name = economy['name']
-        initial_data_growth_rate = economy['data_activity_growth_rate']
-        initial_ai_growth_rate = economy['ai_training_activity_growth_rate']
-        data_intensity_rate = economy['data_intensity_improvement_rate']
-        ai_intensity_rate = economy['ai_training_intensity_improvement_rate']
+        initial_data_growth_rate = economy['initial_data_activity_growth_rate']
+        initial_ai_growth_rate = economy['initial_ai_training_activity_growth_rate']
+        initial_data_intensity_improvement_rate = economy['initial_data_intensity_improvement_rate']
+        initial_ai_intensity_improvement_rate = economy['initial_ai_training_intensity_improvement_rate']
         initial_ratio = economy['initial_data_to_ai_training_ratio']
         initial_energy_pj = economy['initial_energy_pj']
         scheduled_builds = economy.get('scheduled_builds', [])
         new_activity_growth_rates = economy.get('new_activity_growth_rates', [])
+        new_intensity_improvement_rates = economy.get('new_intensity_improvement_rates', [])
         
         years = np.arange(start_year, end_year + 1)
         df = pd.DataFrame(index=years)
@@ -42,13 +43,17 @@ def project_energy_use(config):
         # Set initial growth rates
         df['data_growth_rate'] = initial_data_growth_rate
         df['ai_growth_rate'] = initial_ai_growth_rate
-        
+        df['data_intensity_improvement_rate'] = initial_data_intensity_improvement_rate
+        df['ai_intensity_improvement_rate'] = initial_ai_intensity_improvement_rate
         # Apply any new growth rates based on the specified years
         for new_rate in new_activity_growth_rates:
             if new_rate['year'] in years:
                 df.loc[new_rate['year']:, 'data_growth_rate'] = new_rate['new_data_growth_rate']
                 df.loc[new_rate['year']:, 'ai_growth_rate'] = new_rate['new_ai_growth_rate']
-                
+        for new_rate in new_intensity_improvement_rates:
+            if new_rate['year'] in years:
+                df.loc[new_rate['year']:, 'data_intensity_improvement_rate'] = new_rate['new_data_intensity_improvement_rate']
+                df.loc[new_rate['year']:, 'ai_intensity_improvement_rate'] = new_rate['new_ai_training_intensity_improvement_rate']
         # Initialize activity and intensity levels
         df['data_activity'] = initial_energy_pj * initial_ratio
         df['ai_training_activity'] = initial_energy_pj * (1 - initial_ratio)
@@ -62,14 +67,16 @@ def project_energy_use(config):
             # Use the pre-set growth rates for the current year
             data_growth_rate = df.loc[year, 'data_growth_rate']
             ai_growth_rate = df.loc[year, 'ai_growth_rate']
-
+            data_intensity_improvement_rate = df.loc[year, 'data_intensity_improvement_rate']
+            ai_intensity_improvement_rate = df.loc[year, 'ai_intensity_improvement_rate']
+            
             # Apply growth rates
             df.loc[year, 'data_activity'] = df.loc[prev_year, 'data_activity'] * (1 + data_growth_rate)
             df.loc[year, 'ai_training_activity'] = df.loc[prev_year, 'ai_training_activity'] * (1 + ai_growth_rate)
             
             # Apply intensity improvements
-            df.loc[year, 'data_intensity'] = df.loc[prev_year, 'data_intensity'] * (1 - data_intensity_rate)
-            df.loc[year, 'ai_training_intensity'] = df.loc[prev_year, 'ai_training_intensity'] * (1 - ai_intensity_rate)
+            df.loc[year, 'data_intensity'] = df.loc[prev_year, 'data_intensity'] * (1 - data_intensity_improvement_rate) 
+            df.loc[year, 'ai_training_intensity'] = df.loc[prev_year, 'ai_training_intensity'] * (1 - ai_intensity_improvement_rate)
             
             # Account for scheduled builds in the current year
             for build in scheduled_builds:
@@ -533,5 +540,10 @@ outlook_results = clean_results_for_outlook(projections, apec_aggregate)
 file_date_id = get_latest_date_for_data_file('input_data', 'merged_file_energy_00_APEC_', file_name_end='.csv', EXCLUDE_DATE_STR_START=False)
 outlook_energy = pd.read_csv(os.path.join('input_data', f'merged_file_energy_00_APEC_{file_date_id}.csv'))#this file can be found in Modelling\Integration\APEC\01_FinalEBT
 import_and_compare_to_outlook_results(outlook_results, outlook_energy)
+
+#save  outlook energy to csv in output_data
+file_date = datetime.datetime.now().strftime("%Y%m%d")
+outlook_results.to_csv(os.path.join('output_data', f'data_centres_energy_{file_date}.csv'), index=False)
+
 #############################################################
 #%%
