@@ -1,4 +1,6 @@
+
 #%%
+import datetime as datetime
 import os
 import yaml
 import numpy as np
@@ -10,11 +12,6 @@ import plotly.express as px
 # Change directory to the root of the project 'data-centres'
 root_dir = re.split('data-centres', os.getcwd())[0] + '/data-centres'
 os.chdir(root_dir)
-
-# Load the YAML configuration
-with open('config/parameters.yml', 'r') as file:
-    config = yaml.safe_load(file)
-
 
 #############################################################
 # Project Energy Use
@@ -33,7 +30,7 @@ def project_energy_use(config):
         data_intensity_rate = economy['data_intensity_improvement_rate']
         ai_intensity_rate = economy['ai_training_intensity_improvement_rate']
         initial_ratio = economy['initial_data_to_ai_training_ratio']
-        initial_energy = economy['initial_energy']
+        initial_energy_pj = economy['initial_energy_pj']
         scheduled_builds = economy.get('scheduled_builds', [])
         new_activity_growth_rates = economy.get('new_activity_growth_rates', [])
         
@@ -53,10 +50,10 @@ def project_energy_use(config):
                 df.loc[new_rate['year']:, 'ai_growth_rate'] = new_rate['new_ai_growth_rate']
                 
         # Initialize activity and intensity levels
-        df['data_activity'] = initial_energy * initial_ratio
-        df['ai_training_activity'] = initial_energy * (1 - initial_ratio)
-        df['data_intensity'] = (initial_energy * initial_ratio) / df['data_activity'].iloc[0]
-        df['ai_training_intensity'] = (initial_energy * (1 - initial_ratio)) / df['ai_training_activity'].iloc[0]
+        df['data_activity'] = initial_energy_pj * initial_ratio
+        df['ai_training_activity'] = initial_energy_pj * (1 - initial_ratio)
+        df['data_intensity'] = (initial_energy_pj * initial_ratio) / df['data_activity'].iloc[0]
+        df['ai_training_intensity'] = (initial_energy_pj * (1 - initial_ratio)) / df['ai_training_activity'].iloc[0]
         
         # Project activities, intensities, and scheduled builds over time
         for year in range(start_year + 1, end_year + 1):
@@ -77,7 +74,7 @@ def project_energy_use(config):
             # Account for scheduled builds in the current year
             for build in scheduled_builds:
                 if build['year'] == year:
-                    total_energy = build['additional_energy']
+                    total_energy = build['additional_energy_pj']
                     #calculate the energy use for data and ai_training using the ratio of the activities
                     data_energy = total_energy * (df.loc[year, 'data_activity'] / 
                                                   (df.loc[year, 'data_activity'] + df.loc[year, 'ai_training_activity']))
@@ -112,7 +109,7 @@ def plot_projections(projections, output_dir='plotting_output'):
     
     # Plot area chart for energy use by sector
     fig_energy = px.area(energy, x='year', y='value', 
-                         title='Energy Usage by Sector', labels={'value': 'Energy Use (MWh)', 'year': 'Year'}, 
+                         title='Energy Usage by Sector', labels={'value': 'Energy Use (PJ)', 'year': 'Year'}, 
                          color='variable', facet_col='economy', facet_col_wrap=7)
     
     fig_energy.update_yaxes(matches=None, showticklabels=True)
@@ -371,7 +368,7 @@ def plot_apec_aggregate(apec_aggregate):
     fig_energy.update_layout(
         title='APEC Aggregate - Total Energy Use with Confidence Intervals',
         xaxis_title='Year',
-        yaxis_title='Energy Use (MWh)',
+        yaxis_title='Energy Use (PJ)',
         legend_title='Metrics'
     )
 
@@ -379,13 +376,162 @@ def plot_apec_aggregate(apec_aggregate):
     fig_energy.write_html(fig_energy_path)
     print(f'Saved APEC total energy use plot with CI to {fig_energy_path}')
 
+def clean_results_for_outlook(projections, apec_aggregate):
+    #use the following labels:
+    #     sectors	sub1sectors	sub2sectors	sub3sectors	sub4sectors	fuels	subfuels
+    # 16_other_sector	16_01_buildings	x	x	x	17_electricity	x
+    
+    #get toal energy use and call it value
+    apec_aggregate = apec_aggregate.rename(columns={'total_energy_use':'value'})
+    apec_aggregate = apec_aggregate[['year', 'economy', 'value']]
+    apec_aggregate['economy'] = '00_APEC'
+    apec_aggregate['sectors'] = '16_other_sector'
+    apec_aggregate['sub1sectors'] = '16_01_buildings'
+    apec_aggregate['sub2sectors'] = '16_01_01_commercial_and_public_services'
+    apec_aggregate['sub3sectors'] = '16_01_01_02_data_centres'
+    apec_aggregate['sub4sectors'] = 'x'
+    apec_aggregate['fuels'] = '17_electricity'
+    apec_aggregate['subfuels'] = 'x'
+    apec_aggregate['subtotal_layout'] = False
+    apec_aggregate['subtotal_results'] = False
+    
+    #add the reference and target scenarios   
+    apec_aggregate_ref = apec_aggregate.copy()
+    apec_aggregate_tgt = apec_aggregate.copy()
+    apec_aggregate_ref['scenarios'] = 'reference'
+    apec_aggregate_tgt['scenarios'] = 'target'
+    
+    #do same for projections
+    projections['value'] = projections['data_energy_use'] + projections['ai_training_energy_use']
+    projections = projections[['year', 'economy', 'value']]
+    projections['sectors'] = '16_other_sector'
+    projections['sub1sectors'] = '16_01_buildings'
+    projections['sub2sectors'] = '16_01_01_commercial_and_public_services'
+    projections['sub3sectors'] = '16_01_01_02_data_centres'
+    projections['sub4sectors'] = 'x'
+    projections['fuels'] = '17_electricity'
+    projections['subfuels'] = 'x'
+    projections['subtotal_layout'] = False
+    projections['subtotal_results'] = False
+    
+    #add the reference and target scenarios   
+    projections_ref = projections.copy()
+    projections_tgt = projections.copy()
+    projections_ref['scenarios'] = 'reference'
+    projections_tgt['scenarios'] = 'target'
+    
+    #combine the dataframes
+    outlook_results = pd.concat([apec_aggregate_ref, apec_aggregate_tgt, projections_ref, projections_tgt])
+    
+    return outlook_results
+    
+
+def get_latest_date_for_data_file(data_folder_path, file_name_start, file_name_end='', EXCLUDE_DATE_STR_START=False):
+    """Note that if file_name_end is not specified then it will just take the first file that matches the file_name_start, eben if that matches the end if the file name as well. This is because the file_name_end is not always needed, and this cahnge was made post hoc, so we want to keep the old functionality.
+
+    Args:
+        data_folder_path (_type_): _description_
+        file_name_start (_type_): _description_
+        file_name_end (_type_, optional): _description_. Defaults to None.
+        EXCLUDE_DATE_STR_START if true, if there is DATE at th start of a file_date_id dont treat it as a date. Defaults to False.
+
+    Returns:
+        _type_: _description_
+    """
+    regex_pattern_date = r'\d{8}'
+    if EXCLUDE_DATE_STR_START:
+        regex_pattern_date = r'(?<!DATE)\d{8}'
+    
+    #get list of all files in the data folder
+    all_files = os.listdir(data_folder_path)
+    #filter for only the files with the correct file extension
+    if file_name_end == '':
+        all_files = [file for file in all_files if file_name_start in file]
+    else:
+        all_files = [file for file in all_files if file_name_start in file and file_name_end in file]
+    #drop any files with no date in the name
+    all_files = [file for file in all_files if re.search(regex_pattern_date, file)]
+    #get the date from the file name
+    all_files = [re.search(regex_pattern_date, file).group() for file in all_files]
+    #convert the dates to datetime objects
+    all_files = [datetime.datetime.strptime(date, '%Y%m%d') for date in all_files]
+    #get the latest date
+    if len(all_files) == 0:
+        print('No files found for ' + file_name_start + ' ' + file_name_end)
+        return None
+    # try:
+    latest_date = max(all_files)
+    # except ValueError:
+    #     print('No files found for ' + file_name_start + ' ' + file_name_end)
+    #     return None
+    #convert the latest date to a string
+    latest_date = latest_date.strftime('%Y%m%d')
+    return latest_date
+
+def import_and_compare_to_outlook_results(outlook_results, outlook_energy):
+
+    
+    #melt the df to long format ['scenarios	economy	sectors	sub1sectors	sub2sectors	sub3sectors	sub4sectors	fuels	subfuels	subtotal_layout	subtotal_results']
+    outlook_energy = outlook_energy.melt(id_vars=['scenarios','economy','sectors','sub1sectors','sub2sectors','sub3sectors','sub4sectors','fuels','subfuels','subtotal_layout','subtotal_results'], var_name='year', value_name='value')
+    
+    outlook_energy_buildings = outlook_energy.loc[(outlook_energy['sectors']=='16_other_sector') & (outlook_energy['sub1sectors']=='16_01_buildings') & (~outlook_energy['fuels'].isin([ '17_x_green_electricity', '19_total', '20_total_renewables', '21_modern_renewables']))].copy()
+
+    #create column outlook_energy_buildings['sub3sectors'] and set it to '16_01_01_01_commercial_and_public_services' where sub2sectors is '16_01_01_commercial_and_public_services', else set it to what it already is
+    outlook_energy_buildings['sub3sectors'] = outlook_energy_buildings['sub2sectors']
+    
+    outlook_energy_buildings = outlook_energy_buildings.loc[outlook_energy_buildings['subtotal_layout']==False].copy()
+    outlook_energy_buildings = outlook_energy_buildings.loc[outlook_energy_buildings['subtotal_results']==False].copy()
+
+    outlook_electricity = outlook_energy.loc[(outlook_energy['sectors']=='12_total_final_consumption') & (outlook_energy['fuels']=='17_electricity')].copy()
+    outlook_electricity = outlook_electricity.loc[outlook_electricity['subtotal_layout']==False].copy()
+    outlook_electricity = outlook_electricity.loc[outlook_electricity['subtotal_results']==False].copy()
+    
+    outlook_results = outlook_results.loc[outlook_results['economy']=='00_APEC'].copy()
+    
+    # concat with outlook_results
+    outlook_energy_buildings = pd.concat([outlook_energy_buildings, outlook_results])
+    outlook_electricity = pd.concat([outlook_electricity, outlook_results])
+    
+    #now plot.
+    #where fuel is not electricity, label as other_fuel
+    outlook_energy_buildings['fuels'] = np.where(outlook_energy_buildings['fuels']=='17_electricity', '17_electricity', 'other_fuel')
+    outlook_energy_buildings['color'] = outlook_energy_buildings['sub3sectors']
+    outlook_energy_buildings['pattern'] = outlook_energy_buildings['fuels']
+    #sum up by color,pattern,year,scenarios
+    outlook_energy_buildings = outlook_energy_buildings.groupby(['color','pattern','year','scenarios']).sum().reset_index()
+    
+    fig_energy_buildings = px.area(outlook_energy_buildings, x='year', y='value', color='color', facet_col='scenarios', facet_col_wrap=2, pattern_shape='pattern', title='Energy Usage by Sector', labels={'value': 'Energy Use (PJ)', 'year': 'Year'})
+    fig_energy_buildings_path = os.path.join('plotting_output', 'energy_use_area_buildings.html')
+    fig_energy_buildings.write_html(fig_energy_buildings_path)
+    print(f'Saved energy area plot to {fig_energy_buildings_path}')
+    
+    #concat the sectors for the color
+    #make color the sectors where it is 12_total_final_consumption, then sub3sectors otherwise
+    outlook_electricity['color'] = np.where(outlook_electricity['sectors']=='12_total_final_consumption', outlook_electricity['sectors'], outlook_electricity['sub3sectors'])   
+    #sum up by color,year,scenarios
+    outlook_electricity = outlook_electricity.groupby(['color','year','scenarios']).sum().reset_index()
+    fig_energy_electricity = px.area(outlook_electricity, x='year', y='value', color='color', facet_col='scenarios', facet_col_wrap=2,  title='Energy Usage by Sector', labels={'value': 'Energy Use (PJ)', 'year': 'Year'})
+    fig_energy_electricity_path = os.path.join('plotting_output', 'energy_use_area_electricity.html')
+    fig_energy_electricity.write_html(fig_energy_electricity_path)
+    print(f'Saved energy area plot to {fig_energy_electricity_path}')
+    
     
 #%%
 #############################################################
 # Run projections and generate plots
+
+# Load the YAML configuration
+with open('config/parameters.yml', 'r') as file:
+    config = yaml.safe_load(file)
+
 projections = project_energy_use(config)
 plot_projections(projections)
 apec_aggregate = aggregate_apec_values(projections, config)
 plot_apec_aggregate(apec_aggregate)
+outlook_results = clean_results_for_outlook(projections, apec_aggregate)
+
+file_date_id = get_latest_date_for_data_file('input_data', 'merged_file_energy_00_APEC_', file_name_end='.csv', EXCLUDE_DATE_STR_START=False)
+outlook_energy = pd.read_csv(os.path.join('input_data', f'merged_file_energy_00_APEC_{file_date_id}.csv'))#this file can be found in Modelling\Integration\APEC\01_FinalEBT
+import_and_compare_to_outlook_results(outlook_results, outlook_energy)
 #############################################################
 #%%
