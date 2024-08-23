@@ -1,14 +1,14 @@
 start_year: 2021
 end_year: 2070
 confidence_intervals_percentage_error:
-  data_activity: 0.05
-  ai_training_activity: 0.1
+  data_activity: 0.2
+  ai_training_activity: 1
   data_intensity: 0.05
   ai_training_intensity: 0.05
 economies:
 - name: 01_AUS
-  initial_data_activity_growth_rate: 0.15
-  initial_ai_training_activity_growth_rate: 0.15
+  initial_data_activity_growth_rate: 0.24
+  initial_ai_training_activity_growth_rate: 0.24
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
@@ -19,18 +19,21 @@ economies:
   - year: 2050
     additional_energy_pj: 0.001
   new_activity_growth_rates:
+  - year: 2025
+    new_data_growth_rate: 0.18
+    new_ai_growth_rate: 0.18
   - year: 2030
-    new_data_growth_rate: 0.075
-    new_ai_growth_rate: 0.075
+    new_data_growth_rate: 0.09
+    new_ai_growth_rate: 0.09
   - year: 2035
-    new_data_growth_rate: 0.05
-    new_ai_growth_rate: 0.05
+    new_data_growth_rate: 0.06
+    new_ai_growth_rate: 0.06
   - year: 2040
-    new_data_growth_rate: 0.02
-    new_ai_growth_rate: 0.02
+    new_data_growth_rate: 0.024
+    new_ai_growth_rate: 0.024
   - year: 2045
-    new_data_growth_rate: 0.01
-    new_ai_growth_rate: 0.01
+    new_data_growth_rate: 0.012
+    new_ai_growth_rate: 0.012
   new_intensity_improvement_rates:
   - year: 2030
     new_data_intensity_improvement_rate: 0.01
@@ -39,8 +42,8 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 02_BD
-  initial_data_activity_growth_rate: 0.15
-  initial_ai_training_activity_growth_rate: 0.15
+  initial_data_activity_growth_rate: 0.2
+  initial_ai_training_activity_growth_rate: 0.2
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
@@ -51,6 +54,9 @@ economies:
   - year: 2050
     additional_energy_pj: 0.001
   new_activity_growth_rates:
+  - year: 2025
+    new_data_growth_rate: 0.15
+    new_ai_growth_rate: 0.15
   - year: 2030
     new_data_growth_rate: 0.075
     new_ai_growth_rate: 0.075
@@ -71,8 +77,8 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 03_CDA
-  initial_data_activity_growth_rate: 0.15
-  initial_ai_training_activity_growth_rate: 0.15
+  initial_data_activity_growth_rate: 0.24
+  initial_ai_training_activity_growth_rate: 0.24
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
@@ -83,18 +89,21 @@ economies:
   - year: 2050
     additional_energy_pj: 0.001
   new_activity_growth_rates:
+  - year: 2025
+    new_data_growth_rate: 0.18
+    new_ai_growth_rate: 0.18
   - year: 2030
-    new_data_growth_rate: 0.075
-    new_ai_growth_rate: 0.075
+    new_data_growth_rate: 0.09
+    new_ai_growth_rate: 0.09
   - year: 2035
-    new_data_growth_rate: 0.05
-    new_ai_growth_rate: 0.05
+    new_data_growth_rate: 0.06
+    new_ai_growth_rate: 0.06
   - year: 2040
-    new_data_growth_rate: 0.02
-    new_ai_growth_rate: 0.02
+    new_data_growth_rate: 0.024
+    new_ai_growth_rate: 0.024
   - year: 2045
-    new_data_growth_rate: 0.01
-    new_ai_growth_rate: 0.01
+    new_data_growth_rate: 0.012
+    new_ai_growth_rate: 0.012
   new_intensity_improvement_rates:
   - year: 2030
     new_data_intensity_improvement_rate: 0.01
@@ -103,8 +112,8 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 04_CHL
-  initial_data_activity_growth_rate: 0.15
-  initial_ai_training_activity_growth_rate: 0.15
+  initial_data_activity_growth_rate: 0.2
+  initial_ai_training_activity_growth_rate: 0.2
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
@@ -115,6 +124,9 @@ economies:
   - year: 2050
     additional_energy_pj: 0.001
   new_activity_growth_rates:
+  - year: 2025
+    new_data_growth_rate: 0.15
+    new_ai_growth_rate: 0.15
   - year: 2030
     new_data_growth_rate: 0.075
     new_ai_growth_rate: 0.075
@@ -135,8 +147,8 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 05_PRC
-  initial_data_activity_growth_rate: 0.15
-  initial_ai_training_activity_growth_rate: 0.15
+  initial_data_activity_growth_rate: 0.2
+  initial_ai_training_activity_growth_rate: 0.2
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
@@ -147,6 +159,9 @@ economies:
   - year: 2050
     additional_energy_pj: 0.001
   new_activity_growth_rates:
+  - year: 2025
+    new_data_growth_rate: 0.15
+    new_ai_growth_rate: 0.15
   - year: 2030
     new_data_growth_rate: 0.075
     new_ai_growth_rate: 0.075
@@ -167,8 +182,8 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 06_HKC
-  initial_data_activity_growth_rate: 0.15
-  initial_ai_training_activity_growth_rate: 0.15
+  initial_data_activity_growth_rate: 0.2
+  initial_ai_training_activity_growth_rate: 0.2
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
@@ -179,6 +194,9 @@ economies:
   - year: 2050
     additional_energy_pj: 0.001
   new_activity_growth_rates:
+  - year: 2025
+    new_data_growth_rate: 0.15
+    new_ai_growth_rate: 0.15
   - year: 2030
     new_data_growth_rate: 0.075
     new_ai_growth_rate: 0.075
@@ -199,8 +217,8 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 07_INA
-  initial_data_activity_growth_rate: 0.15
-  initial_ai_training_activity_growth_rate: 0.15
+  initial_data_activity_growth_rate: 0.2
+  initial_ai_training_activity_growth_rate: 0.2
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
@@ -211,6 +229,9 @@ economies:
   - year: 2050
     additional_energy_pj: 0.001
   new_activity_growth_rates:
+  - year: 2025
+    new_data_growth_rate: 0.15
+    new_ai_growth_rate: 0.15
   - year: 2030
     new_data_growth_rate: 0.075
     new_ai_growth_rate: 0.075
@@ -231,8 +252,8 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 08_JPN
-  initial_data_activity_growth_rate: 0.15
-  initial_ai_training_activity_growth_rate: 0.15
+  initial_data_activity_growth_rate: 0.24
+  initial_ai_training_activity_growth_rate: 0.24
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
@@ -243,18 +264,21 @@ economies:
   - year: 2050
     additional_energy_pj: 0.001
   new_activity_growth_rates:
+  - year: 2025
+    new_data_growth_rate: 0.18
+    new_ai_growth_rate: 0.18
   - year: 2030
-    new_data_growth_rate: 0.075
-    new_ai_growth_rate: 0.075
+    new_data_growth_rate: 0.09
+    new_ai_growth_rate: 0.09
   - year: 2035
-    new_data_growth_rate: 0.05
-    new_ai_growth_rate: 0.05
+    new_data_growth_rate: 0.06
+    new_ai_growth_rate: 0.06
   - year: 2040
-    new_data_growth_rate: 0.02
-    new_ai_growth_rate: 0.02
+    new_data_growth_rate: 0.024
+    new_ai_growth_rate: 0.024
   - year: 2045
-    new_data_growth_rate: 0.01
-    new_ai_growth_rate: 0.01
+    new_data_growth_rate: 0.012
+    new_ai_growth_rate: 0.012
   new_intensity_improvement_rates:
   - year: 2030
     new_data_intensity_improvement_rate: 0.01
@@ -263,8 +287,8 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 09_ROK
-  initial_data_activity_growth_rate: 0.15
-  initial_ai_training_activity_growth_rate: 0.15
+  initial_data_activity_growth_rate: 0.24
+  initial_ai_training_activity_growth_rate: 0.24
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
@@ -275,18 +299,21 @@ economies:
   - year: 2050
     additional_energy_pj: 0.001
   new_activity_growth_rates:
+  - year: 2025
+    new_data_growth_rate: 0.18
+    new_ai_growth_rate: 0.18
   - year: 2030
-    new_data_growth_rate: 0.075
-    new_ai_growth_rate: 0.075
+    new_data_growth_rate: 0.09
+    new_ai_growth_rate: 0.09
   - year: 2035
-    new_data_growth_rate: 0.05
-    new_ai_growth_rate: 0.05
+    new_data_growth_rate: 0.06
+    new_ai_growth_rate: 0.06
   - year: 2040
-    new_data_growth_rate: 0.02
-    new_ai_growth_rate: 0.02
+    new_data_growth_rate: 0.024
+    new_ai_growth_rate: 0.024
   - year: 2045
-    new_data_growth_rate: 0.01
-    new_ai_growth_rate: 0.01
+    new_data_growth_rate: 0.012
+    new_ai_growth_rate: 0.012
   new_intensity_improvement_rates:
   - year: 2030
     new_data_intensity_improvement_rate: 0.01
@@ -295,8 +322,8 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 10_MAS
-  initial_data_activity_growth_rate: 0.15
-  initial_ai_training_activity_growth_rate: 0.15
+  initial_data_activity_growth_rate: 0.24
+  initial_ai_training_activity_growth_rate: 0.24
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
@@ -307,18 +334,21 @@ economies:
   - year: 2050
     additional_energy_pj: 0.001
   new_activity_growth_rates:
+  - year: 2025
+    new_data_growth_rate: 0.18
+    new_ai_growth_rate: 0.18
   - year: 2030
-    new_data_growth_rate: 0.075
-    new_ai_growth_rate: 0.075
+    new_data_growth_rate: 0.09
+    new_ai_growth_rate: 0.09
   - year: 2035
-    new_data_growth_rate: 0.05
-    new_ai_growth_rate: 0.05
+    new_data_growth_rate: 0.06
+    new_ai_growth_rate: 0.06
   - year: 2040
-    new_data_growth_rate: 0.02
-    new_ai_growth_rate: 0.02
+    new_data_growth_rate: 0.024
+    new_ai_growth_rate: 0.024
   - year: 2045
-    new_data_growth_rate: 0.01
-    new_ai_growth_rate: 0.01
+    new_data_growth_rate: 0.012
+    new_ai_growth_rate: 0.012
   new_intensity_improvement_rates:
   - year: 2030
     new_data_intensity_improvement_rate: 0.01
@@ -327,8 +357,8 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 11_MEX
-  initial_data_activity_growth_rate: 0.15
-  initial_ai_training_activity_growth_rate: 0.15
+  initial_data_activity_growth_rate: 0.2
+  initial_ai_training_activity_growth_rate: 0.2
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
@@ -339,6 +369,9 @@ economies:
   - year: 2050
     additional_energy_pj: 0.001
   new_activity_growth_rates:
+  - year: 2025
+    new_data_growth_rate: 0.15
+    new_ai_growth_rate: 0.15
   - year: 2030
     new_data_growth_rate: 0.075
     new_ai_growth_rate: 0.075
@@ -359,8 +392,8 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 12_NZ
-  initial_data_activity_growth_rate: 0.15
-  initial_ai_training_activity_growth_rate: 0.15
+  initial_data_activity_growth_rate: 0.2
+  initial_ai_training_activity_growth_rate: 0.2
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
@@ -371,6 +404,9 @@ economies:
   - year: 2050
     additional_energy_pj: 0.001
   new_activity_growth_rates:
+  - year: 2025
+    new_data_growth_rate: 0.15
+    new_ai_growth_rate: 0.15
   - year: 2030
     new_data_growth_rate: 0.075
     new_ai_growth_rate: 0.075
@@ -391,8 +427,8 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 13_PNG
-  initial_data_activity_growth_rate: 0.15
-  initial_ai_training_activity_growth_rate: 0.15
+  initial_data_activity_growth_rate: 0.2
+  initial_ai_training_activity_growth_rate: 0.2
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
@@ -403,6 +439,9 @@ economies:
   - year: 2050
     additional_energy_pj: 0.001
   new_activity_growth_rates:
+  - year: 2025
+    new_data_growth_rate: 0.15
+    new_ai_growth_rate: 0.15
   - year: 2030
     new_data_growth_rate: 0.075
     new_ai_growth_rate: 0.075
@@ -423,8 +462,8 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 14_PE
-  initial_data_activity_growth_rate: 0.15
-  initial_ai_training_activity_growth_rate: 0.15
+  initial_data_activity_growth_rate: 0.2
+  initial_ai_training_activity_growth_rate: 0.2
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
@@ -435,6 +474,9 @@ economies:
   - year: 2050
     additional_energy_pj: 0.001
   new_activity_growth_rates:
+  - year: 2025
+    new_data_growth_rate: 0.15
+    new_ai_growth_rate: 0.15
   - year: 2030
     new_data_growth_rate: 0.075
     new_ai_growth_rate: 0.075
@@ -455,8 +497,8 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 15_PHL
-  initial_data_activity_growth_rate: 0.15
-  initial_ai_training_activity_growth_rate: 0.15
+  initial_data_activity_growth_rate: 0.2
+  initial_ai_training_activity_growth_rate: 0.2
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
@@ -467,6 +509,9 @@ economies:
   - year: 2050
     additional_energy_pj: 0.001
   new_activity_growth_rates:
+  - year: 2025
+    new_data_growth_rate: 0.15
+    new_ai_growth_rate: 0.15
   - year: 2030
     new_data_growth_rate: 0.075
     new_ai_growth_rate: 0.075
@@ -487,8 +532,8 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 16_RUS
-  initial_data_activity_growth_rate: 0.15
-  initial_ai_training_activity_growth_rate: 0.15
+  initial_data_activity_growth_rate: 0.2
+  initial_ai_training_activity_growth_rate: 0.2
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
@@ -499,6 +544,9 @@ economies:
   - year: 2050
     additional_energy_pj: 0.001
   new_activity_growth_rates:
+  - year: 2025
+    new_data_growth_rate: 0.15
+    new_ai_growth_rate: 0.15
   - year: 2030
     new_data_growth_rate: 0.075
     new_ai_growth_rate: 0.075
@@ -519,8 +567,8 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 17_SGP
-  initial_data_activity_growth_rate: 0.15
-  initial_ai_training_activity_growth_rate: 0.15
+  initial_data_activity_growth_rate: 0.2
+  initial_ai_training_activity_growth_rate: 0.2
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
@@ -531,6 +579,9 @@ economies:
   - year: 2050
     additional_energy_pj: 0.001
   new_activity_growth_rates:
+  - year: 2025
+    new_data_growth_rate: 0.15
+    new_ai_growth_rate: 0.15
   - year: 2030
     new_data_growth_rate: 0.075
     new_ai_growth_rate: 0.075
@@ -551,8 +602,8 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 18_CT
-  initial_data_activity_growth_rate: 0.15
-  initial_ai_training_activity_growth_rate: 0.15
+  initial_data_activity_growth_rate: 0.2
+  initial_ai_training_activity_growth_rate: 0.2
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
@@ -563,6 +614,9 @@ economies:
   - year: 2050
     additional_energy_pj: 0.001
   new_activity_growth_rates:
+  - year: 2025
+    new_data_growth_rate: 0.15
+    new_ai_growth_rate: 0.15
   - year: 2030
     new_data_growth_rate: 0.075
     new_ai_growth_rate: 0.075
@@ -583,8 +637,8 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 19_THA
-  initial_data_activity_growth_rate: 0.15
-  initial_ai_training_activity_growth_rate: 0.15
+  initial_data_activity_growth_rate: 0.2
+  initial_ai_training_activity_growth_rate: 0.2
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
@@ -595,6 +649,9 @@ economies:
   - year: 2050
     additional_energy_pj: 0.001
   new_activity_growth_rates:
+  - year: 2025
+    new_data_growth_rate: 0.15
+    new_ai_growth_rate: 0.15
   - year: 2030
     new_data_growth_rate: 0.075
     new_ai_growth_rate: 0.075
@@ -615,8 +672,8 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 20_USA
-  initial_data_activity_growth_rate: 0.15
-  initial_ai_training_activity_growth_rate: 0.15
+  initial_data_activity_growth_rate: 0.30000000000000004
+  initial_ai_training_activity_growth_rate: 0.30000000000000004
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
@@ -627,18 +684,21 @@ economies:
   - year: 2050
     additional_energy_pj: 0.001
   new_activity_growth_rates:
+  - year: 2025
+    new_data_growth_rate: 0.22499999999999998
+    new_ai_growth_rate: 0.22499999999999998
   - year: 2030
-    new_data_growth_rate: 0.075
-    new_ai_growth_rate: 0.075
+    new_data_growth_rate: 0.11249999999999999
+    new_ai_growth_rate: 0.11249999999999999
   - year: 2035
-    new_data_growth_rate: 0.05
-    new_ai_growth_rate: 0.05
+    new_data_growth_rate: 0.07500000000000001
+    new_ai_growth_rate: 0.07500000000000001
   - year: 2040
-    new_data_growth_rate: 0.02
-    new_ai_growth_rate: 0.02
+    new_data_growth_rate: 0.03
+    new_ai_growth_rate: 0.03
   - year: 2045
-    new_data_growth_rate: 0.01
-    new_ai_growth_rate: 0.01
+    new_data_growth_rate: 0.015
+    new_ai_growth_rate: 0.015
   new_intensity_improvement_rates:
   - year: 2030
     new_data_intensity_improvement_rate: 0.01
@@ -647,8 +707,8 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 21_VN
-  initial_data_activity_growth_rate: 0.15
-  initial_ai_training_activity_growth_rate: 0.15
+  initial_data_activity_growth_rate: 0.2
+  initial_ai_training_activity_growth_rate: 0.2
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
@@ -659,6 +719,9 @@ economies:
   - year: 2050
     additional_energy_pj: 0.001
   new_activity_growth_rates:
+  - year: 2025
+    new_data_growth_rate: 0.15
+    new_ai_growth_rate: 0.15
   - year: 2030
     new_data_growth_rate: 0.075
     new_ai_growth_rate: 0.075

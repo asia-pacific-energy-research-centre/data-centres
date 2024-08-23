@@ -69,12 +69,13 @@ with open('config/parameters.yml', 'w') as file:
 #     new_data_growth_rate: 0.01
 #     new_ai_growth_rate: 0.02
 
-initial_data_activity_growth_rate = 0.15
-initial_ai_training_activity_growth_rate = 0.15
+initial_data_activity_growth_rate = 0.2
+initial_ai_training_activity_growth_rate = 0.2
 initial_data_intensity_improvement_rate = 0.05
 initial_ai_training_intensity_improvement_rate = 0.05
 initial_data_to_ai_training_ratio = 0.8
 new_activity_growth_rates = {
+    2025: {'new_data_growth_rate': 0.15, 'new_ai_growth_rate': 0.15},
     2030: {'new_data_growth_rate': 0.075, 'new_ai_growth_rate': 0.075},
     2035: {'new_data_growth_rate': 0.05, 'new_ai_growth_rate': 0.05},
     2040: {'new_data_growth_rate': 0.02, 'new_ai_growth_rate': 0.02},
@@ -108,6 +109,33 @@ for economy in config['economies']:
     economy['scheduled_builds'] = [
         {'year': year, 'additional_energy_pj': value['additional_energy_pj']} for year, value in scheduled_builds.items()]
     
+    #if vlaue is for 20_USA economy then add some specific vlaues:
+    #usa might have an even higher level ofgrowth for data but especially ai, so increase the growth rates for usa
+    if economy['name'] == '20_USA':
+            
+        economy['initial_data_activity_growth_rate'] = float(initial_data_activity_growth_rate) * 1.5
+        economy['initial_ai_training_activity_growth_rate'] = float(initial_ai_training_activity_growth_rate) * 1.5
+        economy['new_activity_growth_rates']  = [ 
+            {'year': year, 'new_data_growth_rate': rate['new_data_growth_rate']*1.5, 'new_ai_growth_rate': rate['new_ai_growth_rate']*1.5} for year, rate in new_activity_growth_rates.items()
+        ]
+    #same for china but slightly less than usa
+    if economy['name'] == '02_CHN':
+            
+        economy['initial_data_activity_growth_rate'] = float(initial_data_activity_growth_rate) * 1.3
+        economy['initial_ai_training_activity_growth_rate'] = float(initial_ai_training_activity_growth_rate) * 1.3
+        economy['new_activity_growth_rates']  = [ 
+            {'year': year, 'new_data_growth_rate': rate['new_data_growth_rate']*1.3, 'new_ai_growth_rate': rate['new_ai_growth_rate']*1.3} for year, rate in new_activity_growth_rates.items()
+        ]
+    #and then same for countries which are seen as data centre hotspots, but slightly less than china
+    if economy['name'] in ['10_MAS','08_JPN', '09_ROK', '03_CDA', '01_AUS']:
+            
+        economy['initial_data_activity_growth_rate'] = float(initial_data_activity_growth_rate) * 1.2
+        economy['initial_ai_training_activity_growth_rate'] = float(initial_ai_training_activity_growth_rate) * 1.2
+        economy['new_activity_growth_rates']  = [ 
+            {'year': year, 'new_data_growth_rate': rate['new_data_growth_rate']*1.2, 'new_ai_growth_rate': rate['new_ai_growth_rate']*1.2} for year, rate in new_activity_growth_rates.items()
+        ]
+    
 with open('config/parameters.yml', 'w') as file:
     yaml.safe_dump(config, file, default_flow_style=False, sort_keys=False)
 # %%
+#add specific

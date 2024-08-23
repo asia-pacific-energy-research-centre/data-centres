@@ -120,10 +120,40 @@ def plot_projections(projections, output_dir='plotting_output'):
                          color='variable', facet_col='economy', facet_col_wrap=7)
     
     fig_energy.update_yaxes(matches=None, showticklabels=True)
-    fig_energy_path = os.path.join(output_dir, 'energy_use_area.html')
+    fig_energy_path = os.path.join(output_dir, 'energy_use_area_by_economy.html')
     fig_energy.write_html(fig_energy_path)
     print(f'Saved energy area plot to {fig_energy_path}')
     
+    #and do a twh version
+    energy['value'] = energy['value'] / 3.6
+    fig_energy = px.area(energy, x='year', y='value', 
+                         title='Energy Usage by Sector', labels={'value': 'Energy Use (TWh)', 'year': 'Year'}, 
+                         color='variable', facet_col='economy', facet_col_wrap=7)
+    fig_energy.update_yaxes(matches=None, showticklabels=True)
+    fig_energy_path = os.path.join(output_dir, 'energy_use_area_by_economy_TWh.html')
+    fig_energy.write_html(fig_energy_path)
+    print(f'Saved energy area plot to {fig_energy_path}')
+    ##
+    #and do one which is just all the economies together, no sectors:
+    energy = projections[['data_energy_use', 'ai_training_energy_use', 'year', 'economy']]
+    energy = energy.melt(id_vars=['year', 'economy'], var_name='variable', value_name='value')
+    energy = energy.groupby(['year', 'economy']).sum().reset_index()
+    #put economies in order of smallest to largest energy use sum
+    energy = energy.sort_values('value')
+    fig_energy = px.area(energy, x='year', y='value', 
+                         title='Energy Usage by Economy', labels={'value': 'Energy Use (PJ)', 'year': 'Year'}, 
+                         color='economy')
+    fig_energy_path = os.path.join(output_dir, 'energy_use_area_by_economy_all.html')
+    fig_energy = fig_energy.update_layout(legend_title='Economy')
+    fig_energy.write_html(fig_energy_path)
+    ##
+    #and by twh
+    energy['value'] = energy['value'] / 3.6
+    fig_energy = px.area(energy, x='year', y='value',title='Energy Usage by Economy', labels={'value': 'Energy Use (TWh)', 'year': 'Year'}, color='economy')
+    fig_energy_path = os.path.join(output_dir, 'energy_use_area_by_economy_all_TWh.html')
+    fig_energy = fig_energy.update_layout(legend_title='Economy')
+    fig_energy.write_html(fig_energy_path)
+    ##
     # Prepare data for indexed activity line chart
     activity = projections[['data_activity_indexed', 'ai_training_activity_indexed', 'year', 'economy']]
     activity = activity.melt(id_vars=['year', 'economy'], var_name='variable', value_name='value')
@@ -134,7 +164,7 @@ def plot_projections(projections, output_dir='plotting_output'):
                            color='variable', facet_col='economy', facet_col_wrap=7)
     
     fig_activity.update_yaxes(matches=None, showticklabels=True)
-    fig_activity_path = os.path.join(output_dir, 'activity_indexed_line.html')
+    fig_activity_path = os.path.join(output_dir, 'activity_indexed_line_by_economy.html')
     fig_activity.write_html(fig_activity_path)
     print(f'Saved activity index plot to {fig_activity_path}')
 
@@ -148,7 +178,7 @@ def plot_projections(projections, output_dir='plotting_output'):
                              color='variable', facet_col='economy', facet_col_wrap=7)
     
     fig_intensity.update_yaxes(matches=None, showticklabels=True)
-    fig_intensity_path = os.path.join(output_dir, 'intensity_line.html')
+    fig_intensity_path = os.path.join(output_dir, 'intensity_line_by_economy.html')
     fig_intensity.write_html(fig_intensity_path)
     print(f'Saved intensity plot to {fig_intensity_path}')
 
@@ -511,7 +541,14 @@ def import_and_compare_to_outlook_results(outlook_results, outlook_energy):
     fig_energy_buildings_path = os.path.join('plotting_output', 'energy_use_area_buildings.html')
     fig_energy_buildings.write_html(fig_energy_buildings_path)
     print(f'Saved energy area plot to {fig_energy_buildings_path}')
-    
+    ##
+    #write it again but for twh
+    outlook_energy_buildings['value'] = outlook_energy_buildings['value'] / 3.6
+    fig_energy_buildings = px.area(outlook_energy_buildings, x='year', y='value', color='color', facet_col='scenarios', facet_col_wrap=2, pattern_shape='pattern', title='Energy Usage by Sector', labels={'value': 'Energy Use (TWh)', 'year': 'Year'})
+    fig_energy_buildings_path = os.path.join('plotting_output', 'energy_use_area_buildings_TWh.html')
+    fig_energy_buildings.write_html(fig_energy_buildings_path)
+    print(f'Saved energy area plot to {fig_energy_buildings_path}')
+    ##
     #concat the sectors for the color
     #make color the sectors where it is 12_total_final_consumption, then sub3sectors otherwise
     outlook_electricity['color'] = np.where(outlook_electricity['sectors']=='12_total_final_consumption', outlook_electricity['sectors'], outlook_electricity['sub3sectors'])   
@@ -521,7 +558,13 @@ def import_and_compare_to_outlook_results(outlook_results, outlook_energy):
     fig_energy_electricity_path = os.path.join('plotting_output', 'energy_use_area_electricity.html')
     fig_energy_electricity.write_html(fig_energy_electricity_path)
     print(f'Saved energy area plot to {fig_energy_electricity_path}')
-    
+    ##
+    #write it again but for twh
+    outlook_electricity['value'] = outlook_electricity['value'] / 3.6
+    fig_energy_electricity = px.area(outlook_electricity, x='year', y='value', color='color', facet_col='scenarios', facet_col_wrap=2,  title='Energy Usage by Sector', labels={'value': 'Energy Use (TWh)', 'year': 'Year'})
+    fig_energy_electricity_path = os.path.join('plotting_output', 'energy_use_area_electricity_TWh.html')
+    fig_energy_electricity.write_html(fig_energy_electricity_path)
+    print(f'Saved energy area plot to {fig_energy_electricity_path}')
     
 #%%
 #############################################################
