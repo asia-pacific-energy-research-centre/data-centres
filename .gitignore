@@ -4,7 +4,7 @@
 *.xls
 *.html
 *.csv
-
+**/previous_parameter_versions/**
 ################PREGENERATED################
 # Byte-compiled / optimized / DLL files
 __pycache__/

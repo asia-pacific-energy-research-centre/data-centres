@@ -13,6 +13,10 @@ import plotly.express as px
 root_dir = re.split('data-centres', os.getcwd())[0] + '/data-centres'
 os.chdir(root_dir)
 #%%
+
+ECONOMIES_TO_KEEP_AS_IS = ['12_NZ']
+
+
 #take in manuels number of datacentres by economy and in the world and also the energy use from datacentres in the world, then estiamte the energy use per datacentre, then claculate the energy use for each economy by multiplying the number of datacentres by the energy use per datacentre. 
 
 number_of_datacentres = pd.read_csv('input_data/Global_Data_Center_Statistics_2023_manuel.csv')#Year	Country	Data Center Count	Economy
@@ -31,10 +35,15 @@ number_of_datacentres['Year'] = 2021
 number_of_datacentres['Data Center Count'] = number_of_datacentres['Data Center Count'] * 0.85 * 0.85
 number_of_datacentres['Energy Use PJ'] = number_of_datacentres['Data Center Count'] * energy_use_per_datacentre_pj
 
+#copy the parameters to config/previous_parameter_versions/parameters_DATE.yml
+date_id = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+os.system(f'cp config/parameters.yml config/previous_parameter_versions/parameters_{date_id}.yml')
+print(f'parameters.yml copied to config/previous_parameter_versions/parameters_{date_id}.yml')
 #open up the yaml and insert the values for each economy:
 with open('config/parameters.yml', 'r') as file:
     config = yaml.safe_load(file)
-
+    #
+#%%
 #for each item in economies, find the name key and extract the Energy Use PJ from number_of_datacentres and insert it into the yaml as initial_energy_pj:
 # e.g.
 # economies:
@@ -42,10 +51,13 @@ with open('config/parameters.yml', 'r') as file:
 #     initial_energy_pj: number_of_datacentres.loc[number_of_datacentres['Economy'] == '01_AUS', 'Energy Use PJ'].values[0]
 #%%
 for economy in config['economies']:
+    if economy['name'] in ECONOMIES_TO_KEEP_AS_IS:
+        continue
     economy_name = economy['name']
     economy_energy_pj = number_of_datacentres.loc[number_of_datacentres['Economy'] == economy_name, 'Energy Use PJ'].values[0]
     economy['initial_energy_pj'] = float(economy_energy_pj) 
     
+#%%
 with open('config/parameters.yml', 'w') as file:
     yaml.safe_dump(config, file, default_flow_style=False, sort_keys=False)
 #%%
@@ -92,6 +104,8 @@ scheduled_builds = {
 
 #now implement them:
 for economy in config['economies']:
+    if economy['name'] in ECONOMIES_TO_KEEP_AS_IS:
+        continue
     economy['initial_data_activity_growth_rate'] = float(initial_data_activity_growth_rate)
     economy['initial_ai_training_activity_growth_rate'] = float(initial_ai_training_activity_growth_rate)
     economy['initial_data_intensity_improvement_rate'] = float(initial_data_intensity_improvement_rate)
@@ -119,7 +133,7 @@ for economy in config['economies']:
             {'year': year, 'new_data_growth_rate': rate['new_data_growth_rate']*1.5, 'new_ai_growth_rate': rate['new_ai_growth_rate']*1.5} for year, rate in new_activity_growth_rates.items()
         ]
     #same for china but slightly less than usa
-    if economy['name'] == '02_CHN':
+    if economy['name'] == '05_PRC':
             
         economy['initial_data_activity_growth_rate'] = float(initial_data_activity_growth_rate) * 1.3
         economy['initial_ai_training_activity_growth_rate'] = float(initial_ai_training_activity_growth_rate) * 1.3
@@ -134,7 +148,17 @@ for economy in config['economies']:
         economy['new_activity_growth_rates']  = [ 
             {'year': year, 'new_data_growth_rate': rate['new_data_growth_rate']*1.2, 'new_ai_growth_rate': rate['new_ai_growth_rate']*1.2} for year, rate in new_activity_growth_rates.items()
         ]
-    
+    #and also a bit lower than avg for economies which have expensive energy, eg hkc sg
+    if economy['name'] in ['06_HKC','17_SGP']:
+            
+        economy['initial_data_activity_growth_rate'] = float(initial_data_activity_growth_rate) * 0.8
+        economy['initial_ai_training_activity_growth_rate'] = float(initial_ai_training_activity_growth_rate) * 0.8
+        economy['new_activity_growth_rates']  = [ 
+            {'year': year, 'new_data_growth_rate': rate['new_data_growth_rate']*0.8, 'new_ai_growth_rate': rate['new_ai_growth_rate']*0.8} for year, rate in new_activity_growth_rates.items()
+        ]
+
+
+#%%
 with open('config/parameters.yml', 'w') as file:
     yaml.safe_dump(config, file, default_flow_style=False, sort_keys=False)
 # %%
