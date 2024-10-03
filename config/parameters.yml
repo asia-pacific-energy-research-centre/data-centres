@@ -599,33 +599,40 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 18_CT
-  initial_data_activity_growth_rate: 0.2
-  initial_ai_training_activity_growth_rate: 0.2
+  initial_data_activity_growth_rate: 0
+  initial_ai_training_activity_growth_rate: 0
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.8
   initial_energy_pj: 2.5644015303333942
   scheduled_builds:
-  - year: 2030
-    additional_energy_pj: 0.001
-  - year: 2050
-    additional_energy_pj: 0.001
-  new_activity_growth_rates:
+  - year: 2024
+    additional_energy_pj: 0.409968
   - year: 2025
-    new_data_growth_rate: 0.15
-    new_ai_growth_rate: 0.15
+    additional_energy_pj: 0.378432
+  - year: 2026
+    additional_energy_pj: 0.7884
+  - year: 2027
+    additional_energy_pj: 0.851472
+  - year: 2028
+    additional_energy_pj: 1.040688
+  - year: 2029
+    additional_energy_pj: 1.040688
   - year: 2030
-    new_data_growth_rate: 0.075
-    new_ai_growth_rate: 0.075
+    additional_energy_pj: 1.324512
+  new_activity_growth_rates:
+  - year: 2030
+    new_data_growth_rate: 0.0825
+    new_ai_growth_rate: 0.0825
   - year: 2035
-    new_data_growth_rate: 0.05
-    new_ai_growth_rate: 0.05
+    new_data_growth_rate: 0.05500000000000001
+    new_ai_growth_rate: 0.05500000000000001
   - year: 2040
-    new_data_growth_rate: 0.02
-    new_ai_growth_rate: 0.02
+    new_data_growth_rate: 0.022000000000000002
+    new_ai_growth_rate: 0.022000000000000002
   - year: 2045
-    new_data_growth_rate: 0.01
-    new_ai_growth_rate: 0.01
+    new_data_growth_rate: 0.011000000000000001
+    new_ai_growth_rate: 0.011000000000000001
   new_intensity_improvement_rates:
   - year: 2030
     new_data_intensity_improvement_rate: 0.01
@@ -738,3 +745,5 @@ economies:
   - year: 2040
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
+
+economies_list: [01_AUS, 02_BD, 03_CDA, 04_CHL, 05_PRC, 06_HKC, 07_INA, 08_JPN, 09_ROK, 10_MAS, 11_MEX, 12_NZ, 13_PNG, 14_PE, 15_PHL, 16_RUS, 17_SGP, 18_CT, 19_THA, 20_USA, 21_VN]

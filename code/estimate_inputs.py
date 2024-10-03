@@ -157,6 +157,30 @@ for economy in config['economies']:
             {'year': year, 'new_data_growth_rate': rate['new_data_growth_rate']*0.8, 'new_ai_growth_rate': rate['new_ai_growth_rate']*0.8} for year, rate in new_activity_growth_rates.items()
         ]
 
+    if economy['name'] in ['18_CT']:
+        
+        #we have data on teh scehduledbuilds fr ai and internet data centres for ct so we can use that and set growth rate to 1 while those are being built
+        #first need to convert form their mw values to pj. that will require hours = 24*365 * 3.6 * 10^-6:
+        scehduled_builds_mw = {
+            2024: 13,
+            2025: 12,
+            2026: 25,
+            2027: 27,
+            2028: 33,
+            2029: 33,
+            2030: 42}
+        scheduled_builds_taiwan = {}
+        for year, mw in scehduled_builds_mw.items():
+            scheduled_builds_taiwan[year] = {'additional_energy_pj': mw * 24 * 365 * 3.6 * 10**-6}
+            
+        economy['scheduled_builds'] = [
+                {'year': year, 'additional_energy_pj': value['additional_energy_pj']} for year, value in scheduled_builds_taiwan.items()]
+        
+        economy['initial_data_activity_growth_rate'] = 0
+        economy['initial_ai_training_activity_growth_rate'] = 0
+        economy['new_activity_growth_rates']  = [ 
+            {'year': year, 'new_data_growth_rate': rate['new_data_growth_rate']*1.1, 'new_ai_growth_rate': rate['new_ai_growth_rate']*1.1} for year, rate in new_activity_growth_rates.items() if year > 2029
+        ]
 
 #%%
 with open('config/parameters.yml', 'w') as file:

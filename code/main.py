@@ -9,6 +9,7 @@ import re
 from scipy.stats import norm
 import plotly.graph_objects as go
 import plotly.express as px
+import shutil
 # Change directory to the root of the project 'data-centres'
 root_dir = re.split('data-centres', os.getcwd())[0] + '/data-centres'
 os.chdir(root_dir)
@@ -462,7 +463,7 @@ def clean_results_for_outlook(projections, apec_aggregate):
     
     return outlook_results
     
-
+    
 def get_latest_date_for_data_file(data_folder_path, file_name_start, file_name_end='', EXCLUDE_DATE_STR_START=False):
     """Note that if file_name_end is not specified then it will just take the first file that matches the file_name_start, eben if that matches the end if the file name as well. This is because the file_name_end is not always needed, and this cahnge was made post hoc, so we want to keep the old functionality.
 
@@ -507,7 +508,6 @@ def get_latest_date_for_data_file(data_folder_path, file_name_start, file_name_e
 
 def import_and_compare_to_outlook_results(outlook_results, outlook_energy):
 
-    
     #melt the df to long format ['scenarios	economy	sectors	sub1sectors	sub2sectors	sub3sectors	sub4sectors	fuels	subfuels	subtotal_layout	subtotal_results']
     outlook_energy = outlook_energy.melt(id_vars=['scenarios','economy','sectors','sub1sectors','sub2sectors','sub3sectors','sub4sectors','fuels','subfuels','subtotal_layout','subtotal_results'], var_name='year', value_name='value')
     
@@ -523,49 +523,144 @@ def import_and_compare_to_outlook_results(outlook_results, outlook_energy):
     outlook_electricity = outlook_electricity.loc[outlook_electricity['subtotal_layout']==False].copy()
     outlook_electricity = outlook_electricity.loc[outlook_electricity['subtotal_results']==False].copy()
     
-    outlook_results = outlook_results.loc[outlook_results['economy']=='00_APEC'].copy()
-    
     # concat with outlook_results
     outlook_energy_buildings = pd.concat([outlook_energy_buildings, outlook_results])
     outlook_electricity = pd.concat([outlook_electricity, outlook_results])
     
-    #now plot.
     #where fuel is not electricity, label as other_fuel
     outlook_energy_buildings['fuels'] = np.where(outlook_energy_buildings['fuels']=='17_electricity', '17_electricity', 'other_fuel')
     outlook_energy_buildings['color'] = outlook_energy_buildings['sub3sectors']
     outlook_energy_buildings['pattern'] = outlook_energy_buildings['fuels']
-    #sum up by color,pattern,year,scenarios
-    outlook_energy_buildings = outlook_energy_buildings.groupby(['color','pattern','year','scenarios']).sum().reset_index()
     
-    fig_energy_buildings = px.area(outlook_energy_buildings, x='year', y='value', color='color', facet_col='scenarios', facet_col_wrap=2, pattern_shape='pattern', title='Energy Usage by Sector', labels={'value': 'Energy Use (PJ)', 'year': 'Year'})
+    outlook_results_APEC = outlook_results.loc[outlook_results['economy']=='00_APEC'].copy()
+    outlook_energy_APEC = outlook_energy.loc[outlook_energy['economy']=='00_APEC'].copy()
+    outlook_energy_buildings_APEC = outlook_energy_buildings.loc[outlook_energy_buildings['economy']=='00_APEC'].copy()
+    outlook_electricity_APEC = outlook_electricity.loc[outlook_electricity['economy']=='00_APEC'].copy()
+    outlook_results = outlook_results.loc[outlook_results['economy']!='00_APEC'].copy()
+    outlook_energy = outlook_energy.loc[outlook_energy['economy']!='00_APEC'].copy()
+    outlook_energy_buildings = outlook_energy_buildings.loc[outlook_energy_buildings['economy']!='00_APEC'].copy()
+    outlook_electricity = outlook_electricity.loc[outlook_electricity['economy']!='00_APEC'].copy()
+    #now plot.
+    #sum up by color,pattern,year,scenarios
+    outlook_energy_buildings_scen = outlook_energy_buildings_APEC.groupby(['color','pattern','year','scenarios']).sum().reset_index()
+    
+    fig_energy_buildings = px.area(outlook_energy_buildings_scen, x='year', y='value', color='color', facet_col='scenarios', facet_col_wrap=2, pattern_shape='pattern', title='Energy Usage by Sector', labels={'value': 'Energy Use (PJ)', 'year': 'Year'})
     fig_energy_buildings_path = os.path.join('plotting_output', 'energy_use_area_buildings.html')
     fig_energy_buildings.write_html(fig_energy_buildings_path)
     print(f'Saved energy area plot to {fig_energy_buildings_path}')
-    ##
+    
     #write it again but for twh
-    outlook_energy_buildings['value'] = outlook_energy_buildings['value'] / 3.6
-    fig_energy_buildings = px.area(outlook_energy_buildings, x='year', y='value', color='color', facet_col='scenarios', facet_col_wrap=2, pattern_shape='pattern', title='Energy Usage by Sector', labels={'value': 'Energy Use (TWh)', 'year': 'Year'})
+    outlook_energy_buildings_scen['value'] = outlook_energy_buildings_scen['value'] / 3.6
+    fig_energy_buildings = px.area(outlook_energy_buildings_scen, x='year', y='value', color='color', facet_col='scenarios', facet_col_wrap=2, pattern_shape='pattern', title='Energy Usage by Sector', labels={'value': 'Energy Use (TWh)', 'year': 'Year'})
     fig_energy_buildings_path = os.path.join('plotting_output', 'energy_use_area_buildings_TWh.html')
     fig_energy_buildings.write_html(fig_energy_buildings_path)
     print(f'Saved energy area plot to {fig_energy_buildings_path}')
     ##
+    #BY ECONOMY: 
+    outlook_energy_buildings_econ = outlook_energy_buildings.groupby(['economy', 'color','pattern','year','scenarios']).sum().reset_index()
+    for scenario in outlook_energy_buildings_econ['scenarios'].unique():
+        outlook_energy_buildings_scen = outlook_energy_buildings_econ.loc[outlook_energy_buildings_econ['scenarios']==scenario]
+        fig_energy_buildings = px.area(outlook_energy_buildings_scen, x='year', y='value', color='color', facet_col='economy', facet_col_wrap=7, pattern_shape='pattern', title=f'Energy Usage by Sector and economy - {scenario}', labels={'value': 'Energy Use (PJ)', 'year': 'Year'})
+        #make the axis independent
+        fig_energy_buildings.update_yaxes(matches=None, showticklabels=True)
+        fig_energy_buildings_path = os.path.join('plotting_output', f'energy_use_area_buildings_by_economy_{scenario}.html')
+        fig_energy_buildings.write_html(fig_energy_buildings_path)
+        print(f'Saved energy area plot to {fig_energy_buildings_path}')
+        
+        #write it again but for twh
+        outlook_energy_buildings_scen['value'] = outlook_energy_buildings_scen['value'] / 3.6
+        fig_energy_buildings = px.area(outlook_energy_buildings_scen, x='year', y='value', color='color', facet_col='scenarios', facet_col_wrap=2, pattern_shape='pattern', title=f'Energy Usage by Sector and economy - {scenario}', labels={'value': 'Energy Use (TWh)', 'year': 'Year'})
+        #make the axis independent
+        fig_energy_buildings.update_yaxes(matches=None, showticklabels=True)
+        fig_energy_buildings_path = os.path.join('plotting_output', f'energy_use_area_buildings_TWh_by_economy_{scenario}.html')
+        fig_energy_buildings.write_html(fig_energy_buildings_path)
+        print(f'Saved energy area plot to {fig_energy_buildings_path}')
+    #
     #concat the sectors for the color
     #make color the sectors where it is 12_total_final_consumption, then sub3sectors otherwise
-    outlook_electricity['color'] = np.where(outlook_electricity['sectors']=='12_total_final_consumption', outlook_electricity['sectors'], outlook_electricity['sub3sectors'])   
+    outlook_electricity_APEC['color'] = np.where(outlook_electricity_APEC['sectors']=='12_total_final_consumption', outlook_electricity_APEC['sectors'], outlook_electricity_APEC['sub3sectors'])   
     #sum up by color,year,scenarios
-    outlook_electricity = outlook_electricity.groupby(['color','year','scenarios']).sum().reset_index()
-    fig_energy_electricity = px.area(outlook_electricity, x='year', y='value', color='color', facet_col='scenarios', facet_col_wrap=2,  title='Energy Usage by Sector', labels={'value': 'Energy Use (PJ)', 'year': 'Year'})
+    outlook_electricity_APEC = outlook_electricity_APEC.groupby(['color','year','scenarios']).sum().reset_index()
+    fig_energy_electricity = px.area(outlook_electricity_APEC, x='year', y='value', color='color', facet_col='scenarios', facet_col_wrap=2,  title='Energy Usage by Sector', labels={'value': 'Energy Use (PJ)', 'year': 'Year'})
     fig_energy_electricity_path = os.path.join('plotting_output', 'energy_use_area_electricity.html')
     fig_energy_electricity.write_html(fig_energy_electricity_path)
     print(f'Saved energy area plot to {fig_energy_electricity_path}')
     ##
     #write it again but for twh
-    outlook_electricity['value'] = outlook_electricity['value'] / 3.6
-    fig_energy_electricity = px.area(outlook_electricity, x='year', y='value', color='color', facet_col='scenarios', facet_col_wrap=2,  title='Energy Usage by Sector', labels={'value': 'Energy Use (TWh)', 'year': 'Year'})
+    outlook_electricity_APEC['value'] = outlook_electricity_APEC['value'] / 3.6
+    fig_energy_electricity = px.area(outlook_electricity_APEC, x='year', y='value', color='color', facet_col='scenarios', facet_col_wrap=2,  title='Energy Usage by Sector', labels={'value': 'Energy Use (TWh)', 'year': 'Year'})
     fig_energy_electricity_path = os.path.join('plotting_output', 'energy_use_area_electricity_TWh.html')
     fig_energy_electricity.write_html(fig_energy_electricity_path)
     print(f'Saved energy area plot to {fig_energy_electricity_path}')
     
+
+def download_all_merged_file_energy_from_economys_from_onedrive(config):
+    known_double_ups_and_their_solutions = ['merged_file_energy_10_MAS_20240905_TGT1.csv']
+    breakpoint()
+    root_onedrive = os.path.join('C:', 'Users', 'finbar.maunsell', 'OneDrive - APERC', 'outlook 9th', 'Modelling', 'Integration')
+    #follow C: with \\
+    root_onedrive = root_onedrive.replace('C:', 'C:\\')
+    root_local = os.path.join('input_data')
+    #look for the csv's in outlook 9th\Modelling\Integration\{ECONOMY}\08_Final, if theres multiple then find the one with the latest date using get_latest_date_for_data_file().
+    file_name_start= 'merged_file_energy'
+    for economy in config['economies_list']:#need a list of econmoies
+        file_name_start_econ = file_name_start+'_'+economy
+        data_folder_path = os.path.join(root_onedrive, economy, '08_Final')
+        date_id = get_latest_date_for_data_file(data_folder_path, file_name_start_econ, file_name_end='.csv', EXCLUDE_DATE_STR_START=False)
+        csvs = [file for file in os.listdir(data_folder_path) if file_name_start_econ in file and date_id in file]
+        if len(csvs) > 1:
+            print(f'Multiple files found for {file_name_start_econ} on {date_id}')
+            found=False
+            for file in csvs:
+                if file in known_double_ups_and_their_solutions:
+                    csv = file
+                    found = True
+                    break
+            if not found:
+                breakpoint()
+                raise ValueError
+        elif len(csvs) == 0:
+            print(f'No files found for {file_name_start_econ} on {date_id}')
+            # raise ValueError
+            continue
+        else:
+            csv = csvs[0]
+        #check th local folder exists
+        if not os.path.exists(os.path.join(root_local, economy)):
+            os.makedirs(os.path.join(root_local, economy))
+        else:
+            # if the file name is the same dont do anything, if not, empty the folder of ifles begining weith merged_file_energy and copy the new file in
+            if not os.path.exists(os.path.join(root_local, economy, csv)):
+                for file in os.listdir(os.path.join(root_local, economy)):
+                    if file_name_start_econ in file:
+                        os.remove(os.path.join(root_local, economy, file))
+        #copy the file
+        shutil.copyfile(os.path.join(data_folder_path, csv), os.path.join(root_local, economy, csv))
+    return None
+
+def concat_all_merged_file_energy_files_from_local(config):
+    all_data = pd.DataFrame()
+    for economy in config['economies_list']:
+        #get the date of the latest file
+        if not os.path.exists(os.path.join('input_data', economy)):
+            continue
+        date_id = get_latest_date_for_data_file(os.path.join('input_data', economy), file_name_start='merged_file_energy', file_name_end='.csv', EXCLUDE_DATE_STR_START=False)
+        #get all the files in the local folder
+        all_files = os.listdir(os.path.join('input_data', economy))
+        #filter for only the files with the correct file extension
+        latest_file = [file for file in all_files if date_id in file and 'merged_file_energy' in file]
+        if len(latest_file) == 0:
+            # raise ValueError
+            print(f'No files found for {economy} on {date_id}')
+        elif len(latest_file) > 1:
+            print(f'Multiple files found for {economy} on {date_id}')
+            breakpoint()
+            raise ValueError
+        else:
+            latest_file = latest_file[0]
+        
+        all_data = pd.concat([all_data, pd.read_csv(os.path.join('input_data', economy, latest_file))])
+    return all_data
 #%%
 #############################################################
 # Run projections and generate plots
@@ -581,8 +676,18 @@ plot_apec_aggregate(apec_aggregate)
 outlook_results = clean_results_for_outlook(projections, apec_aggregate)
 
 file_date_id = get_latest_date_for_data_file('input_data', 'merged_file_energy_00_APEC_', file_name_end='.csv', EXCLUDE_DATE_STR_START=False)
-outlook_energy = pd.read_csv(os.path.join('input_data', f'merged_file_energy_00_APEC_{file_date_id}.csv'))#this file can be found in Modelling\Integration\APEC\01_FinalEBT
-import_and_compare_to_outlook_results(outlook_results, outlook_energy)
+outlook_energy_APEC = pd.read_csv(os.path.join('input_data', f'merged_file_energy_00_APEC_{file_date_id}.csv'))#this file can be found in Modelling\Integration\APEC\01_FinalEBT
+DO_THIS=True
+if DO_THIS:
+    download_all_merged_file_energy_from_economys_from_onedrive(config)
+#%%
+outlook_energy_all_economies = concat_all_merged_file_energy_files_from_local(config) 
+
+if outlook_energy_all_economies.columns.to_list() == outlook_energy_APEC.columns.to_list():
+    outlook_energy_all_economies = pd.concat([outlook_energy_APEC, outlook_energy_all_economies])#assuming the structure is the same
+else:
+    raise ValueError
+import_and_compare_to_outlook_results(outlook_results, outlook_energy_all_economies)
 
 #save  outlook energy to csv in output_data
 file_date = datetime.datetime.now().strftime("%Y%m%d")
