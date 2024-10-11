@@ -418,16 +418,17 @@ def clean_results_for_outlook(projections, apec_aggregate):
     #use the following labels:
     #     sectors	sub1sectors	sub2sectors	sub3sectors	sub4sectors	fuels	subfuels
     # 16_other_sector	16_01_buildings	x	x	x	17_electricity	x
-    
     #get toal energy use and call it value
-    apec_aggregate = apec_aggregate.rename(columns={'total_energy_use':'value'})
-    apec_aggregate = apec_aggregate[['year', 'economy', 'value']]
+    #first metl so that apec_aggregate['data_energy_use'] and apec_aggregate['ai_training_energy_use'] are in the sae column and create a column with their names as ;sub4sectors'
+    apec_aggregate = apec_aggregate.melt(id_vars=['year', 'economy'], value_vars=['data_energy_use', 'ai_training_energy_use'], var_name='sub4sectors', value_name='value')
+    # apec_aggregate = apec_aggregate.rename(columns={'total_energy_use':'value'})
+    apec_aggregate = apec_aggregate[['year', 'economy','sub4sectors', 'value']]
     apec_aggregate['economy'] = '00_APEC'
     apec_aggregate['sectors'] = '16_other_sector'
     apec_aggregate['sub1sectors'] = '16_01_buildings'
     apec_aggregate['sub2sectors'] = '16_01_01_commercial_and_public_services'
     apec_aggregate['sub3sectors'] = '16_01_01_02_data_centres'
-    apec_aggregate['sub4sectors'] = 'x'
+    apec_aggregate['sub4sectors'] = np.where(apec_aggregate['sub4sectors']=='data_energy_use', '16_01_01_02_01_traditional_data_centres', '16_01_01_02_02_ai_training')
     apec_aggregate['fuels'] = '17_electricity'
     apec_aggregate['subfuels'] = 'x'
     apec_aggregate['subtotal_layout'] = False
@@ -440,13 +441,14 @@ def clean_results_for_outlook(projections, apec_aggregate):
     apec_aggregate_tgt['scenarios'] = 'target'
     
     #do same for projections
-    projections['value'] = projections['data_energy_use'] + projections['ai_training_energy_use']
-    projections = projections[['year', 'economy', 'value']]
+    projections = projections.melt(id_vars=['year', 'economy'], value_vars=['data_energy_use', 'ai_training_energy_use'], var_name='sub4sectors', value_name='value')
+    # projections['value'] = projections['data_energy_use'] + projections['ai_training_energy_use']
+    projections = projections[['year', 'economy','sub4sectors', 'value']]
     projections['sectors'] = '16_other_sector'
     projections['sub1sectors'] = '16_01_buildings'
     projections['sub2sectors'] = '16_01_01_commercial_and_public_services'
     projections['sub3sectors'] = '16_01_01_02_data_centres'
-    projections['sub4sectors'] = 'x'
+    projections['sub4sectors'] = np.where(projections['sub4sectors']=='data_energy_use', '16_01_01_02_01_traditional_data_centres', '16_01_01_02_02_ai_training')
     projections['fuels'] = '17_electricity'
     projections['subfuels'] = 'x'
     projections['subtotal_layout'] = False
@@ -529,7 +531,7 @@ def import_and_compare_to_outlook_results(outlook_results, outlook_energy):
     
     #where fuel is not electricity, label as other_fuel
     outlook_energy_buildings['fuels'] = np.where(outlook_energy_buildings['fuels']=='17_electricity', '17_electricity', 'other_fuel')
-    outlook_energy_buildings['color'] = outlook_energy_buildings['sub3sectors']
+    outlook_energy_buildings['color'] = np.where(outlook_energy_buildings['sub3sectors']=='16_01_01_02_data_centres', outlook_energy_buildings['sub4sectors'], outlook_energy_buildings['sub3sectors'])
     outlook_energy_buildings['pattern'] = outlook_energy_buildings['fuels']
     
     outlook_results_APEC = outlook_results.loc[outlook_results['economy']=='00_APEC'].copy()
@@ -578,7 +580,7 @@ def import_and_compare_to_outlook_results(outlook_results, outlook_energy):
     #
     #concat the sectors for the color
     #make color the sectors where it is 12_total_final_consumption, then sub3sectors otherwise
-    outlook_electricity_APEC['color'] = np.where(outlook_electricity_APEC['sectors']=='12_total_final_consumption', outlook_electricity_APEC['sectors'], outlook_electricity_APEC['sub3sectors'])   
+    outlook_electricity_APEC['color'] = np.where(outlook_electricity_APEC['sectors']=='12_total_final_consumption', outlook_electricity_APEC['sectors'], outlook_electricity_APEC['sub4sectors'])   
     #sum up by color,year,scenarios
     outlook_electricity_APEC = outlook_electricity_APEC.groupby(['color','year','scenarios']).sum().reset_index()
     fig_energy_electricity = px.area(outlook_electricity_APEC, x='year', y='value', color='color', facet_col='scenarios', facet_col_wrap=2,  title='Energy Usage by Sector', labels={'value': 'Energy Use (PJ)', 'year': 'Year'})
@@ -593,10 +595,48 @@ def import_and_compare_to_outlook_results(outlook_results, outlook_energy):
     fig_energy_electricity.write_html(fig_energy_electricity_path)
     print(f'Saved energy area plot to {fig_energy_electricity_path}')
     
+    #plot these by economy
+    for economy in outlook_energy_buildings['economy'].unique():
+        outlook_energy_buildings_econ = outlook_energy_buildings.loc[outlook_energy_buildings['economy']==economy].copy()
+        outlook_electricity_econ = outlook_electricity.loc[outlook_electricity['economy']==economy].copy()
+        #we will plot all charts we want in one dashboard. so that will be:
+        #energy use in buildings by sector - target
+        #energy use in buildings by sector - reference
+        #whole economy electricity use compared to data centre electricity use - target
+        #whole economy electricity use compared to data centre electricity use - reference
+        #data centre electricity use by subsector - target
+        #data centre electricity use by subsector - reference
+        
+        #we will create a df which is the concat of the df's needed to make these plots and create a column called 'title' which will be the name of the plot
+        #we will then use this column to facet the plots:
+        outlook_energy_buildings_econ['title'] = np.where(outlook_energy_buildings_econ['scenarios']=='reference', 'Energy Use in Buildings by Sector - Reference', 'Energy Use in Buildings by Sector - Target')
+        outlook_electricity_econ['title'] = np.where(outlook_electricity_econ['scenarios']=='reference', 'Electricity Use by Sector - Reference', 'Electricity Use by Sector - Target')
+        data_centres_energy = outlook_energy_buildings_econ.loc[outlook_energy_buildings_econ['sub3sectors']=='16_01_01_02_data_centres'].copy()
+        data_centres_energy['title'] = np.where(data_centres_energy['scenarios']=='reference', 'Data Centre Electricity Use by Subsector - Reference', 'Data Centre Electricity Use by Subsector - Target')
+        #create a color col in each df
+        outlook_energy_buildings_econ['color'] = np.where(outlook_energy_buildings_econ['sub3sectors']=='16_01_01_02_data_centres', outlook_energy_buildings_econ['sub4sectors'], outlook_energy_buildings_econ['sub3sectors'])
+        #also if a value is zero drop it (to get rid of empty sectors)
+        outlook_energy_buildings_econ = outlook_energy_buildings_econ.loc[outlook_energy_buildings_econ['value']!=0].copy()
+        
+        outlook_electricity_econ['color'] = np.where(outlook_electricity_econ['sectors']=='12_total_final_consumption', outlook_electricity_econ['sectors'], outlook_electricity_econ['sub4sectors'])
+        data_centres_energy['color'] = data_centres_energy['sub4sectors']        
+        #concat
+        all_data = pd.concat([outlook_energy_buildings_econ, outlook_electricity_econ, data_centres_energy])
+        #group and sum alll:
+        all_data = all_data.groupby(['year','color','title']).sum().reset_index()
+        #plot
+        breakpoint()
+        fig_energy_econ = px.area(all_data, x='year', y='value', color='color', facet_col='title', facet_col_wrap=2,  title=f'Data centres energy usage dashbaord - {economy} - all other values are from first iteration', labels={'value': 'Energy Use (PJ)', 'year': 'Year'})
+        #make the axis independent
+        fig_energy_econ.update_yaxes(matches=None, showticklabels=True)
+        fig_energy_econ_path = os.path.join('plotting_output', 'by_economy', f'energy_use_area_econ_{economy}.html')
+        fig_energy_econ.write_html(fig_energy_econ_path)
+        print(f'Saved energy area plot to {fig_energy_econ_path}')
+        
 
 def download_all_merged_file_energy_from_economys_from_onedrive(config):
     known_double_ups_and_their_solutions = ['merged_file_energy_10_MAS_20240905_TGT1.csv']
-    breakpoint()
+    
     root_onedrive = os.path.join('C:', 'Users', 'finbar.maunsell', 'OneDrive - APERC', 'outlook 9th', 'Modelling', 'Integration')
     #follow C: with \\
     root_onedrive = root_onedrive.replace('C:', 'C:\\')
@@ -661,6 +701,15 @@ def concat_all_merged_file_energy_files_from_local(config):
         
         all_data = pd.concat([all_data, pd.read_csv(os.path.join('input_data', economy, latest_file))])
     return all_data
+
+def separate_and_save_output_by_economy(outlook_results, file_date_id):
+    #get the economies
+    economies = outlook_results['economy'].unique()
+    for economy in economies:
+        economy_results = outlook_results.loc[outlook_results['economy']==economy].copy()
+        economy_results = economy_results.drop(columns='economy')
+        economy_results.to_csv(os.path.join('output_data', 'by_economy', f'data_centres_energy_{economy}_{file_date_id}.csv'), index=False)
+    return None
 #%%
 #############################################################
 # Run projections and generate plots
@@ -677,10 +726,11 @@ outlook_results = clean_results_for_outlook(projections, apec_aggregate)
 
 file_date_id = get_latest_date_for_data_file('input_data', 'merged_file_energy_00_APEC_', file_name_end='.csv', EXCLUDE_DATE_STR_START=False)
 outlook_energy_APEC = pd.read_csv(os.path.join('input_data', f'merged_file_energy_00_APEC_{file_date_id}.csv'))#this file can be found in Modelling\Integration\APEC\01_FinalEBT
+
 DO_THIS=True
 if DO_THIS:
     download_all_merged_file_energy_from_economys_from_onedrive(config)
-#%%
+    
 outlook_energy_all_economies = concat_all_merged_file_energy_files_from_local(config) 
 
 if outlook_energy_all_economies.columns.to_list() == outlook_energy_APEC.columns.to_list():
@@ -692,6 +742,8 @@ import_and_compare_to_outlook_results(outlook_results, outlook_energy_all_econom
 #save  outlook energy to csv in output_data
 file_date = datetime.datetime.now().strftime("%Y%m%d")
 outlook_results.to_csv(os.path.join('output_data', f'data_centres_energy_{file_date}.csv'), index=False)
+
+separate_and_save_output_by_economy(outlook_results, file_date)
 
 #############################################################
 #%%
