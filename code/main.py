@@ -31,7 +31,14 @@ def project_energy_use(config):
         initial_data_intensity_improvement_rate = economy['initial_data_intensity_improvement_rate']
         initial_ai_intensity_improvement_rate = economy['initial_ai_training_intensity_improvement_rate']
         initial_ratio = economy['initial_data_to_ai_training_ratio']
-        initial_energy_pj = economy['initial_energy_pj']
+        if 'initial_energy_pj' in economy.keys():
+            initial_energy_pj = economy['initial_energy_pj']
+        elif 'initial_energy_mw' in economy.keys():
+            initial_energy_pj = ((economy['initial_energy_mw'] * 8760) / 3.6) * 1e-6
+        elif 'initial_energy_mwh' in economy.keys():
+            initial_energy_pj = (economy['initial_energy_mwh'] / 3.6) * 1e-6
+        else:
+            raise ValueError('Initial energy not specified')
         scheduled_builds = economy.get('scheduled_builds', [])
         new_activity_growth_rates = economy.get('new_activity_growth_rates', [])
         new_intensity_improvement_rates = economy.get('new_intensity_improvement_rates', [])
@@ -82,7 +89,14 @@ def project_energy_use(config):
             # Account for scheduled builds in the current year
             for build in scheduled_builds:
                 if build['year'] == year:
-                    total_energy = build['additional_energy_pj']
+                    if 'additional_energy_mw' in build.keys():
+                        total_energy = ((build['additional_energy_mw'] * 8760) / 3.6) * 1e-6
+                    elif 'additional_energy_pj' in build.keys():                    
+                        total_energy = build['additional_energy_pj']
+                    elif 'additional_energy_mwh' in build.keys():
+                        total_energy = (build['additional_energy_mwh'] / 3.6) * 1e-6
+                    else:
+                        raise ValueError('Additional energy not specified')
                     #calculate the energy use for data and ai_training using the ratio of the activities
                     data_energy = total_energy * (df.loc[year, 'data_activity'] / 
                                                   (df.loc[year, 'data_activity'] + df.loc[year, 'ai_training_activity']))
@@ -121,7 +135,7 @@ def plot_projections(projections, output_dir='plotting_output'):
                          color='variable', facet_col='economy', facet_col_wrap=7)
     
     fig_energy.update_yaxes(matches=None, showticklabels=True)
-    fig_energy_path = os.path.join(output_dir, 'energy_use_area_by_economy.html')
+    fig_energy_path = os.path.join(output_dir, 'data_centres_energy_use_area_by_economy.html')
     fig_energy.write_html(fig_energy_path)
     print(f'Saved energy area plot to {fig_energy_path}')
     
@@ -131,7 +145,7 @@ def plot_projections(projections, output_dir='plotting_output'):
                          title='Energy Usage by Sector', labels={'value': 'Energy Use (TWh)', 'year': 'Year'}, 
                          color='variable', facet_col='economy', facet_col_wrap=7)
     fig_energy.update_yaxes(matches=None, showticklabels=True)
-    fig_energy_path = os.path.join(output_dir, 'energy_use_area_by_economy_TWh.html')
+    fig_energy_path = os.path.join(output_dir, 'data_centres_energy_use_area_by_economy_TWh.html')
     fig_energy.write_html(fig_energy_path)
     print(f'Saved energy area plot to {fig_energy_path}')
     ##
@@ -144,14 +158,14 @@ def plot_projections(projections, output_dir='plotting_output'):
     fig_energy = px.area(energy, x='year', y='value', 
                          title='Energy Usage by Economy', labels={'value': 'Energy Use (PJ)', 'year': 'Year'}, 
                          color='economy')
-    fig_energy_path = os.path.join(output_dir, 'energy_use_area_by_economy_all.html')
+    fig_energy_path = os.path.join(output_dir, 'data_centres_energy_use_area_by_economy_all.html')
     fig_energy = fig_energy.update_layout(legend_title='Economy')
     fig_energy.write_html(fig_energy_path)
     ##
     #and by twh
     energy['value'] = energy['value'] / 3.6
     fig_energy = px.area(energy, x='year', y='value',title='Energy Usage by Economy', labels={'value': 'Energy Use (TWh)', 'year': 'Year'}, color='economy')
-    fig_energy_path = os.path.join(output_dir, 'energy_use_area_by_economy_all_TWh.html')
+    fig_energy_path = os.path.join(output_dir, 'data_centres_energy_use_area_by_economy_all_TWh.html')
     fig_energy = fig_energy.update_layout(legend_title='Economy')
     fig_energy.write_html(fig_energy_path)
     ##
@@ -428,7 +442,7 @@ def clean_results_for_outlook(projections, apec_aggregate):
     apec_aggregate['sub1sectors'] = '16_01_buildings'
     apec_aggregate['sub2sectors'] = '16_01_01_commercial_and_public_services'
     apec_aggregate['sub3sectors'] = '16_01_01_02_data_centres'
-    apec_aggregate['sub4sectors'] = np.where(apec_aggregate['sub4sectors']=='data_energy_use', '16_01_01_02_01_traditional_data_centres', '16_01_01_02_02_ai_training')
+    apec_aggregate['sub4sectors'] = np.where(apec_aggregate['sub4sectors']=='data_energy_use', '16_01_04_traditional_data_centres', '16_01_03_ai_training')
     apec_aggregate['fuels'] = '17_electricity'
     apec_aggregate['subfuels'] = 'x'
     apec_aggregate['subtotal_layout'] = False
@@ -448,7 +462,7 @@ def clean_results_for_outlook(projections, apec_aggregate):
     projections['sub1sectors'] = '16_01_buildings'
     projections['sub2sectors'] = '16_01_01_commercial_and_public_services'
     projections['sub3sectors'] = '16_01_01_02_data_centres'
-    projections['sub4sectors'] = np.where(projections['sub4sectors']=='data_energy_use', '16_01_01_02_01_traditional_data_centres', '16_01_01_02_02_ai_training')
+    projections['sub4sectors'] = np.where(projections['sub4sectors']=='data_energy_use', '16_01_04_traditional_data_centres', '16_01_03_ai_training')
     projections['fuels'] = '17_electricity'
     projections['subfuels'] = 'x'
     projections['subtotal_layout'] = False
@@ -625,7 +639,6 @@ def import_and_compare_to_outlook_results(outlook_results, outlook_energy):
         #group and sum alll:
         all_data = all_data.groupby(['year','color','title']).sum().reset_index()
         #plot
-        breakpoint()
         fig_energy_econ = px.area(all_data, x='year', y='value', color='color', facet_col='title', facet_col_wrap=2,  title=f'Data centres energy usage dashbaord - {economy} - all other values are from first iteration', labels={'value': 'Energy Use (PJ)', 'year': 'Year'})
         #make the axis independent
         fig_energy_econ.update_yaxes(matches=None, showticklabels=True)
@@ -702,13 +715,26 @@ def concat_all_merged_file_energy_files_from_local(config):
         all_data = pd.concat([all_data, pd.read_csv(os.path.join('input_data', economy, latest_file))])
     return all_data
 
-def separate_and_save_output_by_economy(outlook_results, file_date_id):
+def save_outputs(outlook_results):
+    #make it so the years are pivoted
+    outlook_results = outlook_results.pivot(index=['scenarios','economy','sectors','sub1sectors','sub2sectors','sub3sectors','sub4sectors','fuels','subfuels','subtotal_layout','subtotal_results'], columns='year', values='value').reset_index()
+    breakpoint()
+    ###############
+    #also, TEMP FIX we are going to change things so the sub2sectr is the sub4sectr, and the sub3sectr and sub4sectr are x
+    outlook_results['sub2sectors'] = outlook_results['sub4sectors']
+    outlook_results['sub3sectors'] = 'x'
+    outlook_results['sub4sectors'] = 'x'
+    #we should impelment this at the beginning of the code, but for now we will do it here since there will have to be some thigns changed in the plotting and so on
+    ###############
+    #save  outlook energy to csv in output_data
+    file_date = datetime.datetime.now().strftime("%Y%m%d")
+    outlook_results.to_csv(os.path.join('output_data', f'data_centres_energy_{file_date}.csv'), index=False)
     #get the economies
     economies = outlook_results['economy'].unique()
     for economy in economies:
         economy_results = outlook_results.loc[outlook_results['economy']==economy].copy()
-        economy_results = economy_results.drop(columns='economy')
-        economy_results.to_csv(os.path.join('output_data', 'by_economy', f'data_centres_energy_{economy}_{file_date_id}.csv'), index=False)
+        # economy_results = economy_results.drop(columns='economy')
+        economy_results.to_csv(os.path.join('output_data', 'by_economy', f'data_centres_energy_{economy}_{file_date}.csv'), index=False)
     return None
 #%%
 #############################################################
@@ -739,11 +765,9 @@ else:
     raise ValueError
 import_and_compare_to_outlook_results(outlook_results, outlook_energy_all_economies)
 
-#save  outlook energy to csv in output_data
-file_date = datetime.datetime.now().strftime("%Y%m%d")
-outlook_results.to_csv(os.path.join('output_data', f'data_centres_energy_{file_date}.csv'), index=False)
+save_outputs(outlook_results)
 
-separate_and_save_output_by_economy(outlook_results, file_date)
+
 
 #############################################################
 #%%

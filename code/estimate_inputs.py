@@ -14,7 +14,7 @@ root_dir = re.split('data-centres', os.getcwd())[0] + '/data-centres'
 os.chdir(root_dir)
 #%%
 
-ECONOMIES_TO_KEEP_AS_IS = ['12_NZ']
+ECONOMIES_TO_KEEP_AS_IS = ['12_NZ', '18_CT', '09_ROK', '06_HKC', '10_MAS']
 
 
 #take in manuels number of datacentres by economy and in the world and also the energy use from datacentres in the world, then estiamte the energy use per datacentre, then claculate the energy use for each economy by multiplying the number of datacentres by the energy use per datacentre. 
@@ -81,13 +81,13 @@ with open('config/parameters.yml', 'w') as file:
 #     new_data_growth_rate: 0.01
 #     new_ai_growth_rate: 0.02
 
-initial_data_activity_growth_rate = 0.2
-initial_ai_training_activity_growth_rate = 0.2
+initial_data_activity_growth_rate = 0.15
+initial_ai_training_activity_growth_rate = 0.3
 initial_data_intensity_improvement_rate = 0.05
 initial_ai_training_intensity_improvement_rate = 0.05
-initial_data_to_ai_training_ratio = 0.8
+initial_data_to_ai_training_ratio = 0.9999
 new_activity_growth_rates = {
-    2025: {'new_data_growth_rate': 0.15, 'new_ai_growth_rate': 0.15},
+    2025: {'new_data_growth_rate': 0.1, 'new_ai_growth_rate': 0.25},
     2030: {'new_data_growth_rate': 0.075, 'new_ai_growth_rate': 0.075},
     2035: {'new_data_growth_rate': 0.05, 'new_ai_growth_rate': 0.05},
     2040: {'new_data_growth_rate': 0.02, 'new_ai_growth_rate': 0.02},
