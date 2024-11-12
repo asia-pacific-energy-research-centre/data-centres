@@ -11,13 +11,15 @@ economies:
   initial_ai_training_activity_growth_rate: 0.36
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
-  initial_data_to_ai_training_ratio: 0.95
+  initial_data_to_ai_training_ratio: 0.9999
   initial_energy_pj: 39.235343414100925
   scheduled_builds:
   - year: 2030
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   - year: 2050
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   new_activity_growth_rates:
   - year: 2025
     new_data_growth_rate: 0.12
@@ -46,13 +48,15 @@ economies:
   initial_ai_training_activity_growth_rate: 0.3
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
-  initial_data_to_ai_training_ratio: 0.95
+  initial_data_to_ai_training_ratio: 0.9999
   initial_energy_pj: 0.1282200765166697
   scheduled_builds:
   - year: 2030
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   - year: 2050
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   new_activity_growth_rates:
   - year: 2025
     new_data_growth_rate: 0.1
@@ -81,13 +85,15 @@ economies:
   initial_ai_training_activity_growth_rate: 0.36
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
-  initial_data_to_ai_training_ratio: 0.95
+  initial_data_to_ai_training_ratio: 0.9999
   initial_energy_pj: 43.081945709601015
   scheduled_builds:
   - year: 2030
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   - year: 2050
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   new_activity_growth_rates:
   - year: 2025
     new_data_growth_rate: 0.12
@@ -116,13 +122,15 @@ economies:
   initial_ai_training_activity_growth_rate: 0.3
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
-  initial_data_to_ai_training_ratio: 0.95
+  initial_data_to_ai_training_ratio: 0.9999
   initial_energy_pj: 6.795664055383495
   scheduled_builds:
   - year: 2030
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   - year: 2050
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   new_activity_growth_rates:
   - year: 2025
     new_data_growth_rate: 0.1
@@ -151,13 +159,15 @@ economies:
   initial_ai_training_activity_growth_rate: 0.39
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
-  initial_data_to_ai_training_ratio: 0.95
+  initial_data_to_ai_training_ratio: 0.9999
   initial_energy_pj: 57.570814355984695
   scheduled_builds:
   - year: 2030
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   - year: 2050
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   new_activity_growth_rates:
   - year: 2025
     new_data_growth_rate: 0.13
@@ -190,6 +200,7 @@ economies:
   initial_energy_pj: 3.22
   scheduled_builds:
   - year: 2022
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_pj: 0.264
   new_activity_growth_rates:
   - year: 2023
@@ -219,13 +230,15 @@ economies:
   initial_ai_training_activity_growth_rate: 0.3
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
-  initial_data_to_ai_training_ratio: 0.95
+  initial_data_to_ai_training_ratio: 0.9999
   initial_energy_pj: 10.129386044816906
   scheduled_builds:
   - year: 2030
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   - year: 2050
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   new_activity_growth_rates:
   - year: 2025
     new_data_growth_rate: 0.1
@@ -254,13 +267,15 @@ economies:
   initial_ai_training_activity_growth_rate: 0.36
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
-  initial_data_to_ai_training_ratio: 0.95
+  initial_data_to_ai_training_ratio: 0.9999
   initial_energy_pj: 32.183239205684096
   scheduled_builds:
   - year: 2030
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   - year: 2050
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   new_activity_growth_rates:
   - year: 2025
     new_data_growth_rate: 0.12
@@ -293,14 +308,19 @@ economies:
   initial_energy_mw: 1050
   scheduled_builds:
   - year: 2023
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_mw: 200
   - year: 2024
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_mw: 400
   - year: 2025
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_mw: 750
   - year: 2026
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_mw: 300
   - year: 2027
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_mw: 400
   new_activity_growth_rates:
   - year: 2028
@@ -330,31 +350,47 @@ economies:
   initial_data_to_ai_training_ratio: 0.95
   initial_energy_pj: 7.821424667516852
   scheduled_builds:
+  - year: 2022
+    new_data_to_ai_training_ratio: 0.75
+    additional_energy_mw: 200
   - year: 2023
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_mw: 635
   - year: 2024
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_mw: 700
   - year: 2025
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_mw: 700
   - year: 2026
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_mw: 700
   - year: 2027
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_mw: 600
   - year: 2028
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_mw: 600
   - year: 2029
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_mw: 500
   - year: 2030
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_mw: 500
   - year: 2031
+    new_data_to_ai_training_ratio: 0.95
     additional_energy_mw: 100
   - year: 2032
+    new_data_to_ai_training_ratio: 0.95
     additional_energy_mw: 100
   - year: 2033
+    new_data_to_ai_training_ratio: 0.95
     additional_energy_mw: 100
   - year: 2034
+    new_data_to_ai_training_ratio: 0.95
     additional_energy_mw: 100
   - year: 2035
+    new_data_to_ai_training_ratio: 0.95
     additional_energy_mw: 100
   new_activity_growth_rates:
   - year: 2035
@@ -378,13 +414,15 @@ economies:
   initial_ai_training_activity_growth_rate: 0.3
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
-  initial_data_to_ai_training_ratio: 0.95
+  initial_data_to_ai_training_ratio: 0.9999
   initial_energy_pj: 21.28453270176717
   scheduled_builds:
   - year: 2030
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   - year: 2050
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   new_activity_growth_rates:
   - year: 2025
     new_data_growth_rate: 0.1
@@ -417,8 +455,10 @@ economies:
   initial_energy_pj: 0.5
   scheduled_builds:
   - year: 2025
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_pj: 3
   - year: 2030
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_pj: 3
   new_activity_growth_rates:
   - year: 2030
@@ -445,13 +485,15 @@ economies:
   initial_ai_training_activity_growth_rate: 0.3
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
-  initial_data_to_ai_training_ratio: 0.95
+  initial_data_to_ai_training_ratio: 0.9999
   initial_energy_pj: 0.5128803060666788
   scheduled_builds:
   - year: 2030
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   - year: 2050
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   new_activity_growth_rates:
   - year: 2025
     new_data_growth_rate: 0.1
@@ -480,13 +522,15 @@ economies:
   initial_ai_training_activity_growth_rate: 0.3
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
-  initial_data_to_ai_training_ratio: 0.95
+  initial_data_to_ai_training_ratio: 0.9999
   initial_energy_pj: 2.6926216068500635
   scheduled_builds:
   - year: 2030
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   - year: 2050
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   new_activity_growth_rates:
   - year: 2025
     new_data_growth_rate: 0.1
@@ -515,13 +559,15 @@ economies:
   initial_ai_training_activity_growth_rate: 0.3
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
-  initial_data_to_ai_training_ratio: 0.95
+  initial_data_to_ai_training_ratio: 0.9999
   initial_energy_pj: 5.513463290216797
   scheduled_builds:
   - year: 2030
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   - year: 2050
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   new_activity_growth_rates:
   - year: 2025
     new_data_growth_rate: 0.1
@@ -550,13 +596,15 @@ economies:
   initial_ai_training_activity_growth_rate: 0.3
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
-  initial_data_to_ai_training_ratio: 0.95
+  initial_data_to_ai_training_ratio: 0.9999
   initial_energy_pj: 32.183239205684096
   scheduled_builds:
   - year: 2030
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   - year: 2050
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   new_activity_growth_rates:
   - year: 2025
     new_data_growth_rate: 0.1
@@ -585,13 +633,15 @@ economies:
   initial_ai_training_activity_growth_rate: 0.24
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
-  initial_data_to_ai_training_ratio: 0.95
+  initial_data_to_ai_training_ratio: 0.9999
   initial_energy_pj: 12.6937875751503
   scheduled_builds:
   - year: 2030
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   - year: 2050
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   new_activity_growth_rates:
   - year: 2025
     new_data_growth_rate: 0.08000000000000002
@@ -624,18 +674,25 @@ economies:
   initial_energy_pj: 2.5644015303333942
   scheduled_builds:
   - year: 2024
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_pj: 0.409968
   - year: 2025
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_pj: 0.378432
   - year: 2026
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_pj: 0.7884
   - year: 2027
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_pj: 0.851472
   - year: 2028
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_pj: 1.040688
   - year: 2029
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_pj: 1.040688
   - year: 2030
+    new_data_to_ai_training_ratio: 0.75
     additional_energy_pj: 1.324512
   new_activity_growth_rates:
   - year: 2030
@@ -662,13 +719,15 @@ economies:
   initial_ai_training_activity_growth_rate: 0.3
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
-  initial_data_to_ai_training_ratio: 0.95
+  initial_data_to_ai_training_ratio: 0.9999
   initial_energy_pj: 5.257023137183458
   scheduled_builds:
   - year: 2030
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   - year: 2050
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   new_activity_growth_rates:
   - year: 2025
     new_data_growth_rate: 0.1
@@ -693,21 +752,41 @@ economies:
     new_data_intensity_improvement_rate: 0.005
     new_ai_training_intensity_improvement_rate: 0.005
 - name: 20_USA
-  initial_data_activity_growth_rate: 0.22499999999999998
-  initial_ai_training_activity_growth_rate: 0.44999999999999996
+  initial_data_activity_growth_rate: 0.15
+  initial_ai_training_activity_growth_rate: 0.3
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
   initial_data_to_ai_training_ratio: 0.95
-  initial_energy_pj: 690.8497722718164
+  initial_energy_twh: 275
   scheduled_builds:
-  - year: 2030
-    additional_energy_pj: 0.001
-  - year: 2050
-    additional_energy_pj: 0.001
-  new_activity_growth_rates:
+  - year: 2022
+    new_data_to_ai_training_ratio: 0.75
+    additional_energy_twh: 100
+  - year: 2023
+    new_data_to_ai_training_ratio: 0.75
+    additional_energy_twh: 100
+  - year: 2024
+    new_data_to_ai_training_ratio: 0.75
+    additional_energy_twh: 100
   - year: 2025
-    new_data_growth_rate: 0.15000000000000002
-    new_ai_growth_rate: 0.375
+    new_data_to_ai_training_ratio: 0.75
+    additional_energy_twh: 100
+  - year: 2026
+    new_data_to_ai_training_ratio: 0.75
+    additional_energy_twh: 100
+  - year: 2027
+    new_data_to_ai_training_ratio: 0.75
+    additional_energy_twh: 100
+  - year: 2028
+    new_data_to_ai_training_ratio: 0.75
+    additional_energy_twh: 100
+  - year: 2029
+    new_data_to_ai_training_ratio: 0.75
+    additional_energy_twh: 100
+  - year: 2030
+    new_data_to_ai_training_ratio: 0.75
+    additional_energy_twh: 100
+  new_activity_growth_rates:
   - year: 2030
     new_data_growth_rate: 0.11249999999999999
     new_ai_growth_rate: 0.11249999999999999
@@ -732,13 +811,15 @@ economies:
   initial_ai_training_activity_growth_rate: 0.3
   initial_data_intensity_improvement_rate: 0.05
   initial_ai_training_intensity_improvement_rate: 0.05
-  initial_data_to_ai_training_ratio: 0.95
+  initial_data_to_ai_training_ratio: 0.9999
   initial_energy_pj: 5.513463290216797
   scheduled_builds:
   - year: 2030
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   - year: 2050
     additional_energy_pj: 0.001
+    new_data_to_ai_training_ratio: 0.5
   new_activity_growth_rates:
   - year: 2025
     new_data_growth_rate: 0.1

@@ -13,17 +13,14 @@ import plotly.express as px
 root_dir = re.split('data-centres', os.getcwd())[0] + '/data-centres'
 os.chdir(root_dir)
 #%%
+#the for loops below this will ignore these economies meaning that what you've written for them in the yml file will remain there.
+ECONOMIES_TO_KEEP_AS_IS = ['12_NZ', '18_CT', '09_ROK', '06_HKC', '10_MAS', '20_USA']
 
-ECONOMIES_TO_KEEP_AS_IS = ['12_NZ', '18_CT', '09_ROK', '06_HKC', '10_MAS']
-
-
+#%%
 #take in manuels number of datacentres by economy and in the world and also the energy use from datacentres in the world, then estiamte the energy use per datacentre, then claculate the energy use for each economy by multiplying the number of datacentres by the energy use per datacentre. 
-
 number_of_datacentres = pd.read_csv('input_data/Global_Data_Center_Statistics_2023_manuel.csv')#Year	Country	Data Center Count	Economy
-
 energy_use_datacentres_twh_2022 = 460
 energy_use_datacentres_pj_2022 = energy_use_datacentres_twh_2022 * 3.6
-
 world_datacentre_count_2023 = number_of_datacentres.loc[number_of_datacentres['Country'] == 'World', 'Data Center Count'].values[0]
 #decrease datacentre count by 15% to account for the fact that the datacentre count is from 2023 and the energy use is from 2022
 world_datacentre_count_2022_est = world_datacentre_count_2023 * 0.85
@@ -98,8 +95,8 @@ new_intensity_improvement_rates = {
     2040: {'new_data_intensity_improvement_rate': 0.005, 'new_ai_training_intensity_improvement_rate': 0.005}
 }
 scheduled_builds = {
-    2030: {'additional_energy_pj': 0.001},
-    2050: {'additional_energy_pj': 0.001}
+    2030: {'additional_energy_pj': 0.001, 'new_data_to_ai_training_ratio': 0.75},
+    2050: {'additional_energy_pj': 0.001, 'new_data_to_ai_training_ratio': 0.95}
 }
 
 #now implement them:
@@ -121,7 +118,7 @@ for economy in config['economies']:
         {'year': year, **rates} for year, rates in new_intensity_improvement_rates.items()
     ]
     economy['scheduled_builds'] = [
-        {'year': year, 'additional_energy_pj': value['additional_energy_pj']} for year, value in scheduled_builds.items()]
+        {'year': year, 'additional_energy_pj': value['additional_energy_pj'], 'new_data_to_ai_training_ratio': value['new_data_to_ai_training_ratio']} for year, value in scheduled_builds.items()]
     
     #if vlaue is for 20_USA economy then add some specific vlaues:
     #usa might have an even higher level ofgrowth for data but especially ai, so increase the growth rates for usa
@@ -174,7 +171,7 @@ for economy in config['economies']:
             scheduled_builds_taiwan[year] = {'additional_energy_pj': mw * 24 * 365 * 3.6 * 10**-6}
             
         economy['scheduled_builds'] = [
-                {'year': year, 'additional_energy_pj': value['additional_energy_pj']} for year, value in scheduled_builds_taiwan.items()]
+                {'year': year, 'additional_energy_pj': value['additional_energy_pj'],'new_data_to_ai_training_ratio':value['new_data_to_ai_training_ratio']} for year, value in scheduled_builds_taiwan.items()]
         
         economy['initial_data_activity_growth_rate'] = 0
         economy['initial_ai_training_activity_growth_rate'] = 0
