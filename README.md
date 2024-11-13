@@ -1,3 +1,18 @@
+Example output for USA:
+![us datacentres first pass](https://github.com/user-attachments/assets/49003939-ed1e-4a3f-a0f3-689d65fa7048)
+Example aggregate of all economy's with confidence intervals. (note the bottom half of the total's conf int. is covered by the data centres conf. int.):
+![aggregate with confidence intervals first pass](https://github.com/user-attachments/assets/a2f22d95-783a-4102-9375-e790d0aeb883)
+
+
+# General structure:
+The code is based around the main.py function, except in the case of estimate_inputs.py - which is better to be run as it's own independent script.
+
+## estimate_inputs.py and parameters.yml
+The outputs are dictated by what is in the config/parameters.yml file. These can be edited en-masse using the estimate_inputs.py script, or manually edited where you need specific edits. Chances are that as you complete the model for each economy, you will want to remove them from the estiamte_inputs.py process using the ECONOMIES_TO_KEEP_AS_IS list variable. Also the script will save a dated copy of the previous parameters file to config/previous_parameter_versions/parameters_{date_id}.yml just in case you screw something up. This is pretty useful for testing things.
+
+## main.py and projection_functions.py
+This is where the magic happens. Main.py will run project_energy_use() which will produce a projectino for each economy in parameters.yml. Then after that everything is to do with creating charts and comparisons to data from the buildings model and previous 8th/9th outlook projections. Below I've written (or chatgpt has written) a guide to project energy use. I think reading the code at the same time is most useful.
+
 # 📄 Documentation for `project_energy_use(config)`
 
 Hope you enjoy my chatgpt generated (and slightly adjusted manually) doucmentation with emojis.
