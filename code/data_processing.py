@@ -80,14 +80,13 @@ def concat_all_merged_file_energy_files_from_local(config):
         all_data = pd.concat([all_data, pd.read_csv(os.path.join('input_data', economy, latest_file))])
     return all_data
 
-
 def clean_results_for_outlook(projections, apec_aggregate):
     #use the following labels:
     #     sectors	sub1sectors	sub2sectors	sub3sectors	sub4sectors	fuels	subfuels
     # 16_other_sector	16_01_buildings	x	x	x	17_electricity	x
     #get toal energy use and call it value
     #first metl so that apec_aggregate['data_energy_use'] and apec_aggregate['ai_training_energy_use'] are in the sae column and create a column with their names as ;sub4sectors'
-    apec_aggregate = apec_aggregate.melt(id_vars=['year', 'economy'], value_vars=['data_energy_use', 'ai_training_energy_use'], var_name='sub4sectors', value_name='value')
+    apec_aggregate = apec_aggregate.melt(id_vars=['year', 'economy'], value_vars=['traditional_data_energy_use', 'ai_training_energy_use'], var_name='sub4sectors', value_name='value')
     # apec_aggregate = apec_aggregate.rename(columns={'total_energy_use':'value'})
     apec_aggregate = apec_aggregate[['year', 'economy','sub4sectors', 'value']]
     apec_aggregate['economy'] = '00_APEC'
@@ -95,7 +94,7 @@ def clean_results_for_outlook(projections, apec_aggregate):
     apec_aggregate['sub1sectors'] = '16_01_buildings'
     apec_aggregate['sub2sectors'] = '16_01_01_commercial_and_public_services'
     apec_aggregate['sub3sectors'] = '16_01_01_02_data_centres'
-    apec_aggregate['sub4sectors'] = np.where(apec_aggregate['sub4sectors']=='data_energy_use', '16_01_04_traditional_data_centres', '16_01_03_ai_training')
+    apec_aggregate['sub4sectors'] = np.where(apec_aggregate['sub4sectors']=='traditional_data_energy_use', '16_01_04_traditional_data_centres', '16_01_03_ai_training')
     apec_aggregate['fuels'] = '17_electricity'
     apec_aggregate['subfuels'] = 'x'
     apec_aggregate['subtotal_layout'] = False
@@ -108,14 +107,14 @@ def clean_results_for_outlook(projections, apec_aggregate):
     apec_aggregate_tgt['scenarios'] = 'target'
     
     #do same for projections
-    projections = projections.melt(id_vars=['year', 'economy'], value_vars=['data_energy_use', 'ai_training_energy_use'], var_name='sub4sectors', value_name='value')
+    projections = projections.melt(id_vars=['year', 'economy'], value_vars=['traditional_data_energy_use', 'ai_training_energy_use'], var_name='sub4sectors', value_name='value')
     # projections['value'] = projections['data_energy_use'] + projections['ai_training_energy_use']
     projections = projections[['year', 'economy','sub4sectors', 'value']]
     projections['sectors'] = '16_other_sector'
     projections['sub1sectors'] = '16_01_buildings'
     projections['sub2sectors'] = '16_01_01_commercial_and_public_services'
     projections['sub3sectors'] = '16_01_01_02_data_centres'
-    projections['sub4sectors'] = np.where(projections['sub4sectors']=='data_energy_use', '16_01_04_traditional_data_centres', '16_01_03_ai_training')
+    projections['sub4sectors'] = np.where(projections['sub4sectors']=='traditional_data_energy_use', '16_01_04_traditional_data_centres', '16_01_03_ai_training')
     projections['fuels'] = '17_electricity'
     projections['subfuels'] = 'x'
     projections['subtotal_layout'] = False
@@ -141,8 +140,7 @@ def aggregate_apec_values(projections, config):
     apec_aggregate['economy'] = 'APEC'
     
     # Recalculate intensity for APEC
-    apec_aggregate['data_intensity'] = apec_aggregate['data_energy_use'] / apec_aggregate['data_activity']
-    apec_aggregate['ai_training_intensity'] = apec_aggregate['ai_training_energy_use'] / apec_aggregate['ai_training_activity']
+    apec_aggregate['data_intensity'] = (apec_aggregate['traditional_data_energy_use'] + apec_aggregate['ai_training_energy_use']) / (apec_aggregate['traditional_data_activity'] + apec_aggregate['ai_training_activity'])
     
     def calculate_confidence_interval_simple(metric_values, ci_value):
         # Calculate the confidence interval based on a simple percentage error
@@ -159,17 +157,17 @@ def aggregate_apec_values(projections, config):
         
         
     # Calculate confidence intervals for energy use based on intensity and activity CIs
-    apec_aggregate['data_energy_use'] = apec_aggregate['data_activity'] * apec_aggregate['data_intensity']
-    apec_aggregate['data_energy_use_lower'] = apec_aggregate['data_activity_lower'] * apec_aggregate['data_intensity_lower']
-    apec_aggregate['data_energy_use_upper'] = apec_aggregate['data_activity_upper'] * apec_aggregate['data_intensity_upper']
+    apec_aggregate['traditional_data_energy_use'] = apec_aggregate['traditional_data_activity'] * apec_aggregate['data_intensity']
+    apec_aggregate['traditional_data_energy_use_lower'] = apec_aggregate['traditional_data_activity_lower'] * apec_aggregate['data_intensity_lower']
+    apec_aggregate['traditional_data_energy_use_upper'] = apec_aggregate['traditional_data_activity_upper'] * apec_aggregate['data_intensity_upper']
     
-    apec_aggregate['ai_training_energy_use'] = apec_aggregate['ai_training_activity'] * apec_aggregate['ai_training_intensity']
-    apec_aggregate['ai_training_energy_use_lower'] = apec_aggregate['ai_training_activity_lower'] * apec_aggregate['ai_training_intensity_lower']
-    apec_aggregate['ai_training_energy_use_upper'] = apec_aggregate['ai_training_activity_upper'] * apec_aggregate['ai_training_intensity_upper']
+    apec_aggregate['ai_training_energy_use'] = apec_aggregate['ai_training_activity'] * apec_aggregate['data_intensity']
+    apec_aggregate['ai_training_energy_use_lower'] = apec_aggregate['ai_training_activity_lower'] * apec_aggregate['data_intensity_lower']
+    apec_aggregate['ai_training_energy_use_upper'] = apec_aggregate['ai_training_activity_upper'] * apec_aggregate['data_intensity_upper']
     
-    apec_aggregate['total_energy_use'] = apec_aggregate['data_energy_use'] + apec_aggregate['ai_training_energy_use']
-    apec_aggregate['total_energy_use_lower'] = apec_aggregate['data_energy_use_lower'] + apec_aggregate['ai_training_energy_use_lower']
-    apec_aggregate['total_energy_use_upper'] = apec_aggregate['data_energy_use_upper'] + apec_aggregate['ai_training_energy_use_upper']
+    apec_aggregate['total_energy_use'] = apec_aggregate['traditional_data_energy_use'] + apec_aggregate['ai_training_energy_use']
+    apec_aggregate['total_energy_use_lower'] = apec_aggregate['traditional_data_energy_use_lower'] + apec_aggregate['ai_training_energy_use_lower']
+    apec_aggregate['total_energy_use_upper'] = apec_aggregate['traditional_data_energy_use_upper'] + apec_aggregate['ai_training_energy_use_upper']
     
     return apec_aggregate
 

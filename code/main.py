@@ -29,7 +29,7 @@ with open('config/parameters.yml', 'r') as file:
 #MAIN FUNCTION
 projections = projection_functions.project_energy_use(config)
 #MAIN FUNCTION
-
+#%%
 plotting.plot_projections(projections)
 apec_aggregate = data_processing.aggregate_apec_values(projections, config)
 plotting.plot_apec_aggregate(apec_aggregate)
@@ -38,7 +38,7 @@ outlook_results = data_processing.clean_results_for_outlook(projections, apec_ag
 file_date_id = get_latest_date_for_data_file('input_data', 'merged_file_energy_00_APEC_', file_name_end='.csv', EXCLUDE_DATE_STR_START=False)
 outlook_energy_APEC = pd.read_csv(os.path.join('input_data', f'merged_file_energy_00_APEC_{file_date_id}.csv'))#this file can be found in Modelling\Integration\APEC\01_FinalEBT
 
-DO_THIS=True
+DO_THIS=False
 if DO_THIS:
     data_processing.download_all_merged_file_energy_from_economys_from_onedrive(config)
     

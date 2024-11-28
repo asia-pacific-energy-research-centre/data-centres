@@ -16,7 +16,7 @@ def plot_projections(projections, output_dir='plotting_output'):
         os.makedirs(output_dir)
 
     # Prepare data for energy use area chart
-    energy = projections[['data_energy_use', 'ai_training_energy_use', 'year', 'economy']]
+    energy = projections[['traditional_data_energy_use', 'ai_training_energy_use', 'year', 'economy']]
     energy = energy.melt(id_vars=['year', 'economy'], var_name='variable', value_name='value')
     
     # Plot area chart for energy use by sector
@@ -40,7 +40,7 @@ def plot_projections(projections, output_dir='plotting_output'):
     print(f'Saved energy area plot to {fig_energy_path}')
     ##
     #and do one which is just all the economies together, no sectors:
-    energy = projections[['data_energy_use', 'ai_training_energy_use', 'year', 'economy']]
+    energy = projections[['traditional_data_energy_use', 'ai_training_energy_use', 'year', 'economy']]
     energy = energy.melt(id_vars=['year', 'economy'], var_name='variable', value_name='value')
     energy = energy.groupby(['year', 'economy']).sum().reset_index()
     #put economies in order of smallest to largest energy use sum
@@ -60,7 +60,7 @@ def plot_projections(projections, output_dir='plotting_output'):
     fig_energy.write_html(fig_energy_path)
     ##
     # Prepare data for indexed activity line chart
-    activity = projections[['data_activity_indexed', 'ai_training_activity_indexed', 'year', 'economy']]
+    activity = projections[['traditional_data_activity_indexed', 'ai_training_activity_indexed', 'year', 'economy']]
     activity = activity.melt(id_vars=['year', 'economy'], var_name='variable', value_name='value')
     
     # Plot line chart for indexed activity by sector
@@ -74,7 +74,7 @@ def plot_projections(projections, output_dir='plotting_output'):
     print(f'Saved activity index plot to {fig_activity_path}')
 
     # Prepare data for intensity line chart
-    intensity = projections[['data_intensity', 'ai_training_intensity', 'year', 'economy']]
+    intensity = projections[['data_intensity', 'year', 'economy']]#,'ai_training_intensity'
     intensity = intensity.melt(id_vars=['year', 'economy'], var_name='variable', value_name='value')
     
     # Plot line chart for intensity by sector
@@ -118,7 +118,7 @@ def plot_apec_aggregate(apec_aggregate):
     # Data Activity
     fig_activity.add_trace(go.Scatter(
         x=apec_aggregate['year'],
-        y=apec_aggregate['data_activity'],
+        y=apec_aggregate['traditional_data_activity'],
         mode='lines',
         name='Data Activity',
         line=dict(color='blue')
@@ -127,8 +127,8 @@ def plot_apec_aggregate(apec_aggregate):
     add_confidence_interval(
         fig_activity,
         apec_aggregate['year'],
-        apec_aggregate['data_activity_upper'],
-        apec_aggregate['data_activity_lower'],
+        apec_aggregate['traditional_data_activity_upper'],
+        apec_aggregate['traditional_data_activity_lower'],
         fillcolor='rgba(0, 0, 255, 0.2)',
         name='Data Activity CI'
     )
@@ -181,22 +181,22 @@ def plot_apec_aggregate(apec_aggregate):
         name='Data Intensity CI'
     )
 
-    # AI Training Intensity
-    fig_intensity.add_trace(go.Scatter(
-        x=apec_aggregate['year'],
-        y=apec_aggregate['ai_training_intensity'],
-        mode='lines',
-        name='AI Training Intensity',
-        line=dict(color='orange')
-    ))
-    add_confidence_interval(
-        fig_intensity,
-        apec_aggregate['year'],
-        apec_aggregate['ai_training_intensity_upper'],
-        apec_aggregate['ai_training_intensity_lower'],
-        fillcolor='rgba(255, 165, 0, 0.2)',
-        name='AI Training Intensity CI'
-    )
+    # # AI Training Intensity
+    # fig_intensity.add_trace(go.Scatter(
+    #     x=apec_aggregate['year'],
+    #     y=apec_aggregate['ai_training_intensity'],
+    #     mode='lines',
+    #     name='AI Training Intensity',
+    #     line=dict(color='orange')
+    # ))
+    # add_confidence_interval(
+    #     fig_intensity,
+    #     apec_aggregate['year'],
+    #     apec_aggregate['ai_training_intensity_upper'],
+    #     apec_aggregate['ai_training_intensity_lower'],
+    #     fillcolor='rgba(255, 165, 0, 0.2)',
+    #     name='AI Training Intensity CI'
+    # )
 
     fig_intensity.update_layout(
         title='APEC Aggregate - Intensity with Confidence Intervals',
@@ -232,7 +232,7 @@ def plot_apec_aggregate(apec_aggregate):
     # Data Energy Use (dashed line)
     fig_energy.add_trace(go.Scatter(
         x=apec_aggregate['year'],
-        y=apec_aggregate['data_energy_use'],
+        y=apec_aggregate['traditional_data_energy_use'],
         mode='lines',
         name='Data Energy Use',
         line=dict(color='blue', dash='dash')
@@ -240,8 +240,8 @@ def plot_apec_aggregate(apec_aggregate):
     add_confidence_interval(
         fig_energy,
         apec_aggregate['year'],
-        apec_aggregate['data_energy_use_upper'],
-        apec_aggregate['data_energy_use_lower'],
+        apec_aggregate['traditional_data_energy_use_upper'],
+        apec_aggregate['traditional_data_energy_use_lower'],
         fillcolor='rgba(0, 0, 255, 0.2)',
         name='Data Energy Use CI'
     )
@@ -324,9 +324,17 @@ def import_and_compare_to_outlook_results(outlook_results, outlook_energy):
     fig_energy_buildings_path = os.path.join('plotting_output', 'energy_use_area_buildings_TWh.html')
     fig_energy_buildings.write_html(fig_energy_buildings_path)
     print(f'Saved energy area plot to {fig_energy_buildings_path}')
+    #write for mw
+    outlook_energy_buildings_scen['value'] = outlook_energy_buildings_scen['value'] / 0.00876 #To produce 1 TWh of energy in a year, you would need 114.155 MW of continuous power.
+    fig_energy_buildings = px.area(outlook_energy_buildings_scen, x='year', y='value', color='color', facet_col='scenarios', facet_col_wrap=2, pattern_shape='pattern', title='Capacity by Sector', labels={'value': 'Capacity (MW)', 'year': 'Year'})
+    fig_energy_buildings_path = os.path.join('plotting_output', 'capacity_area_buildings_MW.html')
+    fig_energy_buildings.write_html(fig_energy_buildings_path)
+    print(f'Saved energy area plot to {fig_energy_buildings_path}')
+    
     ##
     #BY ECONOMY: 
     outlook_energy_buildings_econ = outlook_energy_buildings.groupby(['economy', 'color','pattern','year','scenarios']).sum().reset_index()
+    
     for scenario in outlook_energy_buildings_econ['scenarios'].unique():
         outlook_energy_buildings_scen = outlook_energy_buildings_econ.loc[outlook_energy_buildings_econ['scenarios']==scenario]
         fig_energy_buildings = px.area(outlook_energy_buildings_scen, x='year', y='value', color='color', facet_col='economy', facet_col_wrap=7, pattern_shape='pattern', title=f'Energy Usage by Sector and economy - {scenario}', labels={'value': 'Energy Use (PJ)', 'year': 'Year'})
@@ -338,10 +346,19 @@ def import_and_compare_to_outlook_results(outlook_results, outlook_energy):
         
         #write it again but for twh
         outlook_energy_buildings_scen['value'] = outlook_energy_buildings_scen['value'] / 3.6
-        fig_energy_buildings = px.area(outlook_energy_buildings_scen, x='year', y='value', color='color', facet_col='scenarios', facet_col_wrap=2, pattern_shape='pattern', title=f'Energy Usage by Sector and economy - {scenario}', labels={'value': 'Energy Use (TWh)', 'year': 'Year'})
+        fig_energy_buildings = px.area(outlook_energy_buildings_scen, x='year', y='value', color='color', facet_col='economy', facet_col_wrap=7, pattern_shape='pattern', title=f'Energy Usage by Sector and economy - {scenario}', labels={'value': 'Energy Use (TWh)', 'year': 'Year'})
         #make the axis independent
         fig_energy_buildings.update_yaxes(matches=None, showticklabels=True)
         fig_energy_buildings_path = os.path.join('plotting_output', f'energy_use_area_buildings_TWh_by_economy_{scenario}.html')
+        fig_energy_buildings.write_html(fig_energy_buildings_path)
+        print(f'Saved energy area plot to {fig_energy_buildings_path}')
+        
+        #write it again but for mw
+        outlook_energy_buildings_scen['value'] = outlook_energy_buildings_scen['value'] / 0.00876
+        fig_energy_buildings = px.area(outlook_energy_buildings_scen, x='year', y='value', color='color', facet_col='economy', facet_col_wrap=7, pattern_shape='pattern', title=f'Capacity by Sector and economy - {scenario}', labels={'value': 'Capacity (MW)', 'year': 'Year'})
+        #make the axis independent
+        fig_energy_buildings.update_yaxes(matches=None, showticklabels=True)
+        fig_energy_buildings_path = os.path.join('plotting_output', f'capacity_area_buildings_MW_by_economy_{scenario}.html')
         fig_energy_buildings.write_html(fig_energy_buildings_path)
         print(f'Saved energy area plot to {fig_energy_buildings_path}')
     #
@@ -360,6 +377,12 @@ def import_and_compare_to_outlook_results(outlook_results, outlook_energy):
     fig_energy_electricity = px.area(outlook_electricity_APEC, x='year', y='value', color='color', facet_col='scenarios', facet_col_wrap=2,  title='Energy Usage by Sector', labels={'value': 'Energy Use (TWh)', 'year': 'Year'})
     fig_energy_electricity_path = os.path.join('plotting_output', 'energy_use_area_electricity_TWh.html')
     fig_energy_electricity.write_html(fig_energy_electricity_path)
+    print(f'Saved energy area plot to {fig_energy_electricity_path}')
+    #write for mw
+    outlook_electricity_APEC['value'] = outlook_electricity_APEC['value'] / 0.00876 #To produce 1 TWh of energy in a year, you would need 114.155 MW of continuous power.
+    fig_energy_electricity = px.area(outlook_electricity_APEC, x='year', y='value', color='color', facet_col='scenarios', facet_col_wrap=2,  title='Capacity by Sector', labels={'value': 'Capacity (MW)', 'year': 'Year'})
+    fig_energy_electricity_path = os.path.join('plotting_output', 'capacity_area_electricity_MW.html')
+    fig_energy_electricity.write_html(fig_energy_electricity_path)  
     print(f'Saved energy area plot to {fig_energy_electricity_path}')
     
     #plot these by economy
@@ -398,4 +421,21 @@ def import_and_compare_to_outlook_results(outlook_results, outlook_energy):
         fig_energy_econ_path = os.path.join('plotting_output', 'by_economy', f'energy_use_area_econ_{economy}.html')
         fig_energy_econ.write_html(fig_energy_econ_path)
         print(f'Saved energy area plot to {fig_energy_econ_path}')
+        
+        #and do it by twh and by mw
+        all_data['value'] = all_data['value'] / 3.6
+        fig_energy_econ = px.area(all_data, x='year', y='value', color='color', facet_col='title', facet_col_wrap=2,  title=f'Data centres energy usage dashbaord - {economy} - all other values are from first iteration', labels={'value': 'Energy Use (TWh)', 'year': 'Year'})
+        #make the axis independent
+        fig_energy_econ.update_yaxes(matches=None, showticklabels=True)
+        fig_energy_econ_path = os.path.join('plotting_output', 'by_economy_Twh', f'energy_use_area_econ_TWh_{economy}.html')
+        fig_energy_econ.write_html(fig_energy_econ_path)
+        
+        all_data['value'] = all_data['value'] / 0.00876 #To produce 1 TWh of energy in a year, you would need 114.155 MW of continuous power.
+        fig_energy_econ = px.area(all_data, x='year', y='value', color='color', facet_col='title', facet_col_wrap=2,  title=f'Data centres capacity dashbaord - {economy} - all other values are from first iteration', labels={'value': 'Capacity (MW)', 'year': 'Year'})
+        #make the axis independent
+        fig_energy_econ.update_yaxes(matches=None, showticklabels=True)
+        fig_energy_econ_path = os.path.join('plotting_output', 'by_economy_MW', f'capacity_area_econ_MW_{economy}.html')
+        fig_energy_econ.write_html(fig_energy_econ_path)
+    
+
         
